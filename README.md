@@ -1,6 +1,7 @@
 # Learn Claude Code -- A nano Claude Code-like agent, built from 0 to 1
 
-[English](./README.md) | [中文](./README-zh.md) | [日本語](./README-ja.md)
+[English](./README.md) | [中文](./README-zh.md) | [日本語](./README-ja.md) | [Türkçe](./README-tr.md)
+
 
 ```
                     THE AGENT PATTERN
