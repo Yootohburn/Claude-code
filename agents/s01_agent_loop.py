@@ -70,8 +70,12 @@ def agent_loop(messages: list):
             model=MODEL, system=SYSTEM, messages=messages,
             tools=TOOLS, max_tokens=8000,
         )
-        # Append assistant turn
-        messages.append({"role": "assistant", "content": response.content})
+        # Append assistant turn - convert SDK objects to dicts
+        content_dicts = [
+            {"type": block.type, **block.model_dump(exclude={"type"})}
+            for block in response.content
+        ]
+        messages.append({"role": "assistant", "content": content_dicts})
         # If the model didn't call a tool, we're done
         if response.stop_reason != "tool_use":
             return
