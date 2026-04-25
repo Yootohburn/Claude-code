@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "addy-agent-skills": {
+      "source": {
+        "source": "directory",
+        "path": "/home/user/agent-skills"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "agent-skills@addy-agent-skills": true
+  }
+}
