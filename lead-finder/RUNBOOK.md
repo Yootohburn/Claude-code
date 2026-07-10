@@ -98,15 +98,32 @@ hashtag URLs: #bangkoknewbar, #newrestaurantbangkok, #ร้านเปิด�
 
 ### Replying in Slack only (no need to open Claude Code)
 
-Slack cannot push your DM reply into a Claude Code session — there is no
-Slack-event → session trigger today, and the @Claude Slack app starts separate
-channel-based sessions with none of this project's context. Instead, a
-**Routine** ("Beervana lead-finder: Slack DM approval poller",
-`trig_01V3CgC4TNtzV3pfbQJRDEXD`) wakes this session **hourly at :03,
-09:00–23:00 Bangkok time**, reads the DM, and acts on whatever it finds
-(a second Routine, "Beervana lead-finder: weekly run"
-`trig_014AmFZUt9UDAwVCvB2A6oPF`, fires the full research run every Monday
-~09:40 Bangkok):
+Slack cannot push your DM reply into a Claude Code session, and constant
+polling burns tokens (every wake-up re-reads the whole session context).
+So the design avoids any standing loop:
+
+- **Weekly run Routine** (`trig_014AmFZUt9UDAwVCvB2A6oPF`) — Monday ~09:40
+  Bangkok: full research run + approval DM.
+- **Burst checks** — after each summary DM, Claude arms at most two one-shot
+  check-ins (a few hours later, next morning) to catch your Slack reply,
+  then stops. Cost: ~3 wake-ups per week instead of 15 per day.
+- **On-demand DM command handler** (`trig_01MHyxPUDmL64GEnq4RJoqrk`) — a
+  Routine with NO schedule. It runs only when fired, reads the DM, and acts.
+  For **instant** Slack-reply handling, wire it to a webhook (one-time setup):
+  1. Open https://claude.ai/code/routines → "Beervana lead-finder: DM command
+     handler" → edit → Select a trigger → **Add another trigger → API** →
+     copy the URL and **Generate token** (shown once).
+  2. In Slack **Workflow Builder**, create a workflow triggered by an emoji
+     reaction (e.g. you reacting 🍺 in the DM/channel) or a shortcut, with a
+     "send a webhook" step: POST to that URL with header
+     `Authorization: Bearer <token>` (plus `anthropic-beta:
+     experimental-cc-routine-2026-04-01`, `anthropic-version: 2023-06-01`).
+     If Workflow Builder can't set headers on your plan, relay through a free
+     Make/Zapier webhook instead.
+  3. From then on: reply in the DM, tap the reaction, and the handler fires
+     within seconds — tokens are spent only when there is real work.
+
+When the handler runs it acts on whatever it finds in the DM:
 
 - "ok" / "post it" → posts the pending summary to the team channel
 - "remove #N" / "cut X" / "add venue Y" → applies edits, re-sends revised DM
