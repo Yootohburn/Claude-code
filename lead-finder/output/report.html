@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beervana Lead Finder — 2026-07-10</title>
+<style>
+:root {
+  --bg:#101014; --surface:#17171d; --surface2:#1e1e26; --line:#2a2a35;
+  --ink:#e8e6e3; --ink2:#a9a7b0; --muted:#77747f;
+  --amber:#e8a33d; --amber-soft:#8a6425; --hot:#e4693d; --link:#7fb4e6;
+}
+* { box-sizing:border-box; margin:0; }
+body { background:var(--bg); color:var(--ink); font:15px/1.5 -apple-system,'Segoe UI',Roboto,'Noto Sans Thai',sans-serif; padding:32px 24px 64px; max-width:1080px; margin:0 auto; }
+h1 { font-size:24px; letter-spacing:.2px; }
+h1 .beer { color:var(--amber); }
+.meta { color:var(--ink2); margin:4px 0 24px; }
+.tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:32px; }
+.tile { background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px 16px; }
+.tile .n { font-size:26px; font-weight:650; }
+.tile .l { color:var(--ink2); font-size:12.5px; margin-top:2px; }
+section { margin-bottom:28px; }
+h2 { font-size:16px; margin-bottom:10px; color:var(--ink); }
+h2 .count { color:var(--muted); font-weight:400; font-size:13px; }
+.newweek { border:1px solid var(--amber-soft); border-radius:12px; padding:18px; background:linear-gradient(180deg,#1d1a12,var(--surface)); margin-bottom:32px; }
+.newweek h2 { color:var(--amber); }
+.tablewrap { overflow-x:auto; border:1px solid var(--line); border-radius:10px; background:var(--surface); }
+table { border-collapse:collapse; width:100%; min-width:820px; }
+th { text-align:left; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); padding:10px 12px; border-bottom:1px solid var(--line); }
+td { padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:var(--surface2); }
+.vname { font-weight:600; }
+.sub { color:var(--muted); font-weight:400; font-size:12.5px; max-width:260px; }
+.scorebar { display:flex; align-items:center; gap:8px; min-width:130px; }
+.scoreval { width:26px; text-align:right; font-variant-numeric:tabular-nums; }
+.track { flex:1; height:6px; background:var(--surface2); border-radius:4px; overflow:hidden; }
+.fill { height:100%; background:var(--amber); border-radius:4px; }
+.fill.hot { background:var(--hot); }
+.chip { background:var(--surface2); border:1px solid var(--line); border-radius:20px; padding:1px 8px; font-size:11.5px; color:var(--ink2); }
+.chip.warn { color:var(--amber); border-color:var(--amber-soft); }
+.newweek.due { border-color:#7a4a35; background:linear-gradient(180deg,#1d1512,var(--surface)); }
+.newweek.due h2 { color:var(--hot); }
+.duelist { list-style:none; }
+.duelist li { margin:6px 0; color:var(--ink2); }
+.duelist b { color:var(--ink); }
+.status { border-radius:20px; padding:2px 9px; font-size:12px; border:1px solid var(--line); }
+.s-new { color:var(--amber); border-color:var(--amber-soft); }
+.s-contacted { color:var(--link); }
+.s-meeting { color:#9ac97f; }
+.s-closed { color:var(--muted); }
+a { color:var(--link); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.watch { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
+.watch .card { background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px 16px; }
+.watch h3 { font-size:13.5px; margin-bottom:8px; color:var(--ink2); }
+.watch ul { list-style:none; }
+.watch li { margin:4px 0; font-size:13px; overflow-wrap:anywhere; }
+footer { color:var(--muted); font-size:12.5px; margin-top:36px; }
+</style></head><body>
+<h1><span class="beer">🍺 Beervana</span> — Bangkok New Venue Lead Finder</h1>
+<div class="meta">Run of 2026-07-10 · scores 0–100 for craft beer fit · 🔥 = 70+</div>
+
+<div class="tiles">
+  <div class="tile"><div class="n">9</div><div class="l">New this week</div></div>
+  <div class="tile"><div class="n">9</div><div class="l">Active leads (all time)</div></div>
+  <div class="tile"><div class="n">0</div><div class="l">Hot (score 70+)</div></div>
+  <div class="tile"><div class="n">0</div><div class="l">In pipeline (Contacted/Meeting)</div></div>
+  <div class="tile"><div class="n">0</div><div class="l">Follow-ups due</div></div>
+  <div class="tile"><div class="n">8</div><div class="l">Excluded (hotel/cut)</div></div>
+</div>
+
+
+
+<div class="newweek">
+<h2>🆕 New this week — 2026-07-10</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Venue</th><th>Area</th><th>Craft-fit score</th><th>Source</th>
+<th>Found</th><th>Phone</th><th>Status</th><th>Map</th></tr></thead>
+<tbody><tr>
+<td class="vname">Tempo Room (House of Tango)<div class="sub">Family-style sharing tapas, clay-oven aromas, candlelit tables and vinyl</div></td>
+<td>Sukhumvit</td>
+<td><div class="scorebar"><div class="scoreval">55</div><div class="track"><div class="fill " style="width:55%"></div></div></div></td>
+<td>Koktail Magazine (Apr 2026 new openings) </td>
+<td>2026-07-10</td>
+<td>—</td>
+<td><span class="status s-new">New</span></td>
+<td><a href="https://www.google.com/maps/search/?api=1&amp;query=Tempo+Room+%28House+of+Tango%29+Sukhumvit+Bangkok" target="_blank">Maps ↗</a></td>
+</tr>
+<tr>
+<td class="vname">Liana<div class="sub">European seasonal dishes with local produce, minimalist open kitchen; savory + pastry chef duo</div></td>
+<td>Old Town</td>
+<td><div class="scorebar"><div class="scoreval">40</div><div class="track"><div class="fill " style="width:40%"></div></div></div></td>
+<td>Michelin Guide Thailand (May 2026 new additions) <span class="chip">Michelin Guide</span> <span class="chip warn">⚠ verify date</span></td>
+<td>2026-07-10</td>
+<td>—</td>
+<td><span class="status s-new">New</span></td>
+<td><a href="https://www.google.com/maps/search/?api=1&amp;query=Liana+Old+Town+Bangkok" target="_blank">Maps ↗</a></td>
+</tr>
+<tr>
+<td class="vname">Sala Saneha<div class="sub">Wine bar + restaurant + 25-seat indie cinema + bookstore in a 70-year-old shophouse; 2,000-bottle list</div></td>
+<td>Silom</td>
+<td><div class="scorebar"><div class="scoreval">40</div><div class="track"><div class="fill " style="width:40%"></div></div></div></td>
+<td>Time Out Bangkok (best new bars 2026) </td>
+<td>2026-07-10</td>
+<td>—</td>
+<td><span class="status s-new">New</span></td>
+<td><a href="https://www.google.com/maps/search/?api=1&amp;query=Sala+Saneha+Silom+Bangkok" target="_blank">Maps ↗</a></td>
+</tr>
+<tr>
+<td class="vname">Hannibal Bar<div class="sub">Hidden rooftop cocktail bar, 90s Hong Kong cinema × cyberpunk mood, DJ sets to midnight</div></td>
+<td>Yaowarat</td>
+<td><div class="scorebar"><div class="scoreval">30</div><div class="track"><div class="fill " style="width:30%"></div></div></div></td>
+<td>Time Out Bangkok (Thai) / Friday Bangkok </td>
+<td>2026-07-10</td>
+<td>—</td>
+<td><span class="status s-new">New</span></td>
+<td><a href="https://www.google.com/maps/search/?api=1&amp;query=Hannibal+Bar+Yaowarat+Bangkok" target="_blank">Maps ↗</a></td>
+</tr>
+<tr>
+<td class="vname">Hippopotoshi BKK<div class="sub">French-Japanese bistro by chef Hitoshi Komatsu</div></td>
+<td>Ploenchit</td>
+<td><div class="scorebar"><div class="scoreval">25</div><div class="track"><div class="fill " style="width:25%"></div></div></div></td>
+<td>Koktail Magazine (Apr 2026) </td>
+<td>2026-07-10</td>
+<td>—</td>
+<td><span class="status s-new">New</span></td>
+<td><a href="https://www.google.com/maps/search/?api=1&amp;query=Hippopotoshi+BKK+Ploenchit+Bangkok" target="_blank">Maps ↗</a></td>
+</tr>
+<tr>
+<td class="vname">Urbani Bangkok (Sathorn Square)<div class="sub">Fine dining by truffle house Urbani Tartufi, chef Gonzalo Ruiz</div></td>
+<td>Sathorn</td>
+<td><div class="scorebar"><div class="scoreval">25</div><div class="track"><div class="fill " style="width:25%"></div></div></div></td>
+<td>Masala Thai (Jul 2026) </td>
+<td>2026-07-10</td>
+<td>—</td>
+<td><span class="status s-new">New</span></td>
+<td><a href="https://www.google.com/maps/search/?api=1&amp;query=Urbani+Bangkok+%28Sathorn+Square%29+Sathorn+Bangkok" target="_blank">Maps ↗</a></td>
+</tr>
+<tr>
+<td class="vname">Blessing Shophouse<div class="sub">Creative shophouse bar concept by a designer/architect team</div></td>
+<td>Bangkok (TBC)</td>
+<td><div class="scorebar"><div class="scoreval">20</div><div class="track"><div class="fill " style="width:20%"></div></div></div></td>
+<td>Time Out Bangkok (Thai, new bars) </td>
+<td>2026-07-10</td>
+<td>—</td>
+<td><span class="status s-new">New</span></td>
+<td><a href="https://www.google.com/maps/search/?api=1&amp;query=Blessing+Shophouse+Bangkok+%28TBC%29+Bangkok" target="_blank">Maps ↗</a></td>
+</tr>
+<tr>
+<td class="vname">Silo<div class="sub">Open-fire kitchen, small plates to large cuts (jasmine wagyu), underground mood</div></td>
+<td>Silom</td>
+<td><div class="scorebar"><div class="scoreval">20</div><div class="track"><div class="fill " style="width:20%"></div></div></div></td>
+<td>Koktail Magazine / The NOISE </td>
+<td>2026-07-10</td>
+<td>—</td>
+<td><span class="status s-new">New</span></td>
+<td><a href="https://www.google.com/maps/search/?api=1&amp;query=Silo+Silom+Bangkok" target="_blank">Maps ↗</a></td>
+</tr>
+<tr>
+<td class="vname">PICKLEBOY Coffee &amp; Burger<div class="sub">Post-game burgers, coffee and matcha at a pickleball club</div></td>
+<td>Udomsuk</td>
+<td><div class="scorebar"><div class="scoreval">10</div><div class="track"><div class="fill " style="width:10%"></div></div></div></td>
+<td>Masala Thai (Jun 2026) </td>
+<td>2026-07-10</td>
+<td>—</td>
+<td><span class="status s-new">New</span></td>
+<td><a href="https://www.google.com/maps/search/?api=1&amp;query=PICKLEBOY+Coffee+%26+Burger+Udomsuk+Bangkok" target="_blank">Maps ↗</a></td>
+</tr></tbody></table></div>
+</div>
+
+<section><h2>Sukhumvit <span class="count">1 venue</span></h2><div class="tablewrap"><table>
+<thead><tr><th>Venue</th><th>Area</th><th>Craft-fit score</th><th>Source</th>
+<th>Found</th><th>Phone</th><th>Status</th><th>Map</th></tr></thead>
+<tbody><tr>
+<td class="vname">Tempo Room (House of Tango)<div class="sub">Family-style sharing tapas, clay-oven aromas, candlelit tables and vinyl</div></td>
+<td>Sukhumvit</td>
+<td><div class="scorebar"><div class="scoreval">55</div><div class="track"><div class="fill " style="width:55%"></div></div></div></td>
+<td>Koktail Magazine (Apr 2026 new openings) </td>
+<td>2026-07-10</td>
+<td>—</td>
+<td><span class="status s-new">New</span></td>
+<td><a href="https://www.google.com/maps/search/?api=1&amp;query=Tempo+Room+%28House+of+Tango%29+Sukhumvit+Bangkok" target="_blank">Maps ↗</a></td>
+</tr></tbody></table></div></section><section><h2>Old Town <span class="count">1 venue</span></h2><div class="tablewrap"><table>
+<thead><tr><th>Venue</th><th>Area</th><th>Craft-fit score</th><th>Source</th>
+<th>Found</th><th>Phone</th><th>Status</th><th>Map</th></tr></thead>
+<tbody><tr>
+<td class="vname">Liana<div class="sub">European seasonal dishes with local produce, minimalist open kitchen; savory + pastry chef duo</div></td>
+<td>Old Town</td>
+<td><div class="scorebar"><div class="scoreval">40</div><div class="track"><div class="fill " style="width:40%"></div></div></div></td>
+<td>Michelin Guide Thailand (May 2026 new additions) <span class="chip">Michelin Guide</span> <span class="chip warn">⚠ verify date</span></td>
+<td>2026-07-10</td>
+<td>—</td>
+<td><span class="status s-new">New</span></td>
+<td><a href="https://www.google.com/maps/search/?api=1&amp;query=Liana+Old+Town+Bangkok" target="_blank">Maps ↗</a></td>
+</tr></tbody></table></div></section><section><h2>Silom <span class="count">2 venues</span></h2><div class="tablewrap"><table>
+<thead><tr><th>Venue</th><th>Area</th><th>Craft-fit score</th><th>Source</th>
+<th>Found</th><th>Phone</th><th>Status</th><th>Map</th></tr></thead>
+<tbody><tr>
+<td class="vname">Sala Saneha<div class="sub">Wine bar + restaurant + 25-seat indie cinema + bookstore in a 70-year-old shophouse; 2,000-bottle list</div></td>
+<td>Silom</td>
+<td><div class="scorebar"><div class="scoreval">40</div><div class="track"><div class="fill " style="width:40%"></div></div></div></td>
+<td>Time Out Bangkok (best new bars 2026) </td>
+<td>2026-07-10</td>
+<td>—</td>
+<td><span class="status s-new">New</span></td>
+<td><a href="https://www.google.com/maps/search/?api=1&amp;query=Sala+Saneha+Silom+Bangkok" target="_blank">Maps ↗</a></td>
+</tr>
+<tr>
+<td class="vname">Silo<div class="sub">Open-fire kitchen, small plates to large cuts (jasmine wagyu), underground mood</div></td>
+<td>Silom</td>
+<td><div class="scorebar"><div class="scoreval">20</div><div class="track"><div class="fill " style="width:20%"></div></div></div></td>
+<td>Koktail Magazine / The NOISE </td>
+<td>2026-07-10</td>
+<td>—</td>
+<td><span class="status s-new">New</span></td>
+<td><a href="https://www.google.com/maps/search/?api=1&amp;query=Silo+Silom+Bangkok" target="_blank">Maps ↗</a></td>
+</tr></tbody></table></div></section><section><h2>Yaowarat <span class="count">1 venue</span></h2><div class="tablewrap"><table>
+<thead><tr><th>Venue</th><th>Area</th><th>Craft-fit score</th><th>Source</th>
+<th>Found</th><th>Phone</th><th>Status</th><th>Map</th></tr></thead>
+<tbody><tr>
+<td class="vname">Hannibal Bar<div class="sub">Hidden rooftop cocktail bar, 90s Hong Kong cinema × cyberpunk mood, DJ sets to midnight</div></td>
+<td>Yaowarat</td>
+<td><div class="scorebar"><div class="scoreval">30</div><div class="track"><div class="fill " style="width:30%"></div></div></div></td>
+<td>Time Out Bangkok (Thai) / Friday Bangkok </td>
+<td>2026-07-10</td>
+<td>—</td>
+<td><span class="status s-new">New</span></td>
+<td><a href="https://www.google.com/maps/search/?api=1&amp;query=Hannibal+Bar+Yaowarat+Bangkok" target="_blank">Maps ↗</a></td>
+</tr></tbody></table></div></section><section><h2>Ploenchit <span class="count">1 venue</span></h2><div class="tablewrap"><table>
+<thead><tr><th>Venue</th><th>Area</th><th>Craft-fit score</th><th>Source</th>
+<th>Found</th><th>Phone</th><th>Status</th><th>Map</th></tr></thead>
+<tbody><tr>
+<td class="vname">Hippopotoshi BKK<div class="sub">French-Japanese bistro by chef Hitoshi Komatsu</div></td>
+<td>Ploenchit</td>
+<td><div class="scorebar"><div class="scoreval">25</div><div class="track"><div class="fill " style="width:25%"></div></div></div></td>
+<td>Koktail Magazine (Apr 2026) </td>
+<td>2026-07-10</td>
+<td>—</td>
+<td><span class="status s-new">New</span></td>
+<td><a href="https://www.google.com/maps/search/?api=1&amp;query=Hippopotoshi+BKK+Ploenchit+Bangkok" target="_blank">Maps ↗</a></td>
+</tr></tbody></table></div></section><section><h2>Sathorn <span class="count">1 venue</span></h2><div class="tablewrap"><table>
+<thead><tr><th>Venue</th><th>Area</th><th>Craft-fit score</th><th>Source</th>
+<th>Found</th><th>Phone</th><th>Status</th><th>Map</th></tr></thead>
+<tbody><tr>
+<td class="vname">Urbani Bangkok (Sathorn Square)<div class="sub">Fine dining by truffle house Urbani Tartufi, chef Gonzalo Ruiz</div></td>
+<td>Sathorn</td>
+<td><div class="scorebar"><div class="scoreval">25</div><div class="track"><div class="fill " style="width:25%"></div></div></div></td>
+<td>Masala Thai (Jul 2026) </td>
+<td>2026-07-10</td>
+<td>—</td>
+<td><span class="status s-new">New</span></td>
+<td><a href="https://www.google.com/maps/search/?api=1&amp;query=Urbani+Bangkok+%28Sathorn+Square%29+Sathorn+Bangkok" target="_blank">Maps ↗</a></td>
+</tr></tbody></table></div></section><section><h2>Bangkok (TBC) <span class="count">1 venue</span></h2><div class="tablewrap"><table>
+<thead><tr><th>Venue</th><th>Area</th><th>Craft-fit score</th><th>Source</th>
+<th>Found</th><th>Phone</th><th>Status</th><th>Map</th></tr></thead>
+<tbody><tr>
+<td class="vname">Blessing Shophouse<div class="sub">Creative shophouse bar concept by a designer/architect team</div></td>
+<td>Bangkok (TBC)</td>
+<td><div class="scorebar"><div class="scoreval">20</div><div class="track"><div class="fill " style="width:20%"></div></div></div></td>
+<td>Time Out Bangkok (Thai, new bars) </td>
+<td>2026-07-10</td>
+<td>—</td>
+<td><span class="status s-new">New</span></td>
+<td><a href="https://www.google.com/maps/search/?api=1&amp;query=Blessing+Shophouse+Bangkok+%28TBC%29+Bangkok" target="_blank">Maps ↗</a></td>
+</tr></tbody></table></div></section><section><h2>Udomsuk <span class="count">1 venue</span></h2><div class="tablewrap"><table>
+<thead><tr><th>Venue</th><th>Area</th><th>Craft-fit score</th><th>Source</th>
+<th>Found</th><th>Phone</th><th>Status</th><th>Map</th></tr></thead>
+<tbody><tr>
+<td class="vname">PICKLEBOY Coffee &amp; Burger<div class="sub">Post-game burgers, coffee and matcha at a pickleball club</div></td>
+<td>Udomsuk</td>
+<td><div class="scorebar"><div class="scoreval">10</div><div class="track"><div class="fill " style="width:10%"></div></div></div></td>
+<td>Masala Thai (Jun 2026) </td>
+<td>2026-07-10</td>
+<td>—</td>
+<td><span class="status s-new">New</span></td>
+<td><a href="https://www.google.com/maps/search/?api=1&amp;query=PICKLEBOY+Coffee+%26+Burger+Udomsuk+Bangkok" target="_blank">Maps ↗</a></td>
+</tr></tbody></table></div></section>
+
+<section><h2>📱 TikTok / Instagram watchlist (manual review → manual_adds.csv)</h2>
+<div class="watch">
+  <div class="card"><h3>TikTok hashtags</h3><ul><li><a href="https://www.tiktok.com/tag/bangkoknewbar" target="_blank">https://www.tiktok.com/tag/bangkoknewbar</a></li><li><a href="https://www.tiktok.com/tag/newrestaurantbangkok" target="_blank">https://www.tiktok.com/tag/newrestaurantbangkok</a></li><li><a href="https://www.tiktok.com/tag/%E0%B8%A3%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94%E0%B9%83%E0%B8%AB%E0%B8%A1%E0%B9%88" target="_blank">https://www.tiktok.com/tag/%E0%B8%A3%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94%E0%B9%83%E0%B8%AB%E0%B8%A1%E0%B9%88</a></li><li><a href="https://www.tiktok.com/tag/%E0%B8%9A%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94%E0%B9%83%E0%B8%AB%E0%B8%A1%E0%B9%88" target="_blank">https://www.tiktok.com/tag/%E0%B8%9A%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94%E0%B9%83%E0%B8%AB%E0%B8%A1%E0%B9%88</a></li><li><a href="https://www.tiktok.com/tag/%E0%B8%84%E0%B8%A3%E0%B8%B2%E0%B8%9F%E0%B8%97%E0%B9%8C%E0%B9%80%E0%B8%9A%E0%B8%B5%E0%B8%A2%E0%B8%A3%E0%B9%8C" target="_blank">https://www.tiktok.com/tag/%E0%B8%84%E0%B8%A3%E0%B8%B2%E0%B8%9F%E0%B8%97%E0%B9%8C%E0%B9%80%E0%B8%9A%E0%B8%B5%E0%B8%A2%E0%B8%A3%E0%B9%8C</a></li></ul></div>
+  <div class="card"><h3>Instagram hashtags</h3><ul><li><a href="https://www.instagram.com/explore/tags/bangkoknewbar/" target="_blank">https://www.instagram.com/explore/tags/bangkoknewbar/</a></li><li><a href="https://www.instagram.com/explore/tags/newrestaurantbangkok/" target="_blank">https://www.instagram.com/explore/tags/newrestaurantbangkok/</a></li><li><a href="https://www.instagram.com/explore/tags/%E0%B8%A3%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94%E0%B9%83%E0%B8%AB%E0%B8%A1%E0%B9%88/" target="_blank">https://www.instagram.com/explore/tags/%E0%B8%A3%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94%E0%B9%83%E0%B8%AB%E0%B8%A1%E0%B9%88/</a></li><li><a href="https://www.instagram.com/explore/tags/%E0%B8%9A%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94%E0%B9%83%E0%B8%AB%E0%B8%A1%E0%B9%88/" target="_blank">https://www.instagram.com/explore/tags/%E0%B8%9A%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94%E0%B9%83%E0%B8%AB%E0%B8%A1%E0%B9%88/</a></li><li><a href="https://www.instagram.com/explore/tags/%E0%B8%84%E0%B8%A3%E0%B8%B2%E0%B8%9F%E0%B8%97%E0%B9%8C%E0%B9%80%E0%B8%9A%E0%B8%B5%E0%B8%A2%E0%B8%A3%E0%B9%8C/" target="_blank">https://www.instagram.com/explore/tags/%E0%B8%84%E0%B8%A3%E0%B8%B2%E0%B8%9F%E0%B8%97%E0%B9%8C%E0%B9%80%E0%B8%9A%E0%B8%B5%E0%B8%A2%E0%B8%A3%E0%B9%8C/</a></li></ul></div>
+</div></section>
+
+<footer>Generated by lead_finder.py · data in data/venues.db · statuses: New → Contacted → Meeting → Closed</footer>
+</body></html>
