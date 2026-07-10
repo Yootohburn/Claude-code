@@ -80,6 +80,24 @@ hashtag URLs: #bangkoknewbar, #newrestaurantbangkok, #ร้านเปิด�
 4. Reply with edits ("remove #3", "add venue X") → Claude applies them and shows
    the revised summary in your DM again before posting.
 
+### Replying in Slack only (no need to open Claude Code)
+
+Slack cannot push your DM reply into a Claude Code session — there is no
+Slack-event → session trigger today, and the @Claude Slack app starts separate
+channel-based sessions with none of this project's context. Instead, a
+**Routine** ("Beervana lead-finder: Slack DM approval poller",
+`trig_019dPmpdqyC2ZyisXCTUEoCb`) wakes this session **hourly at :03,
+09:00–23:00 Bangkok time**, reads the DM, and acts on whatever it finds:
+
+- "ok" / "post it" → posts the pending summary to the team channel
+- "remove #N" / "cut X" / "add venue Y" → applies edits, re-sends revised DM
+- "run the lead finder" → kicks off the full weekly run
+- no reply → does nothing, silently
+
+So a Slack-only reply is acted on within the hour. Typing in the Claude Code
+session is still the instant path. Manage the Routine from the session
+("pause/delete the approval poller") if it's ever noisy.
+
 ## 5. Files
 
 | Path | What it is |
