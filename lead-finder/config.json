@@ -1,0 +1,67 @@
+{
+  "project": "Beervana — Bangkok New Venue Lead Finder",
+  "city": "Bangkok",
+  "target_areas": [
+    "Thonglor", "Ekkamai", "Ari", "Silom", "Sathorn", "Sukhumvit",
+    "Charoenkrung", "Yaowarat", "Phra Khanong", "On Nut", "Udomsuk",
+    "Ploenchit", "Chidlom", "Old Town", "Banglamphu"
+  ],
+  "priority_areas": ["Thonglor", "Ekkamai", "Ari"],
+  "recency_months": 3,
+  "low_review_count_threshold": 150,
+  "exclude_keywords": [
+    "hotel", "hostel", "resort",
+    "marriott", "hyatt", "hilton", "moxy", "andaz", "dusit thani",
+    "dusit central", "mercure", "novotel", "ibis", "kimpton", "sheraton",
+    "westin", "conrad", "intercontinental", "sofitel", "pullman",
+    "banyan tree", "anantara", "avani", "centara", "sindhorn kempinski",
+    "four seasons", "capella", "st. regis", "st regis", "park hyatt",
+    "waldorf", "okura", "carlton", "radisson", "holiday inn"
+  ],
+  "scoring": {
+    "craft_beer_concept": 30,
+    "drinks_led": 20,
+    "priority_area": 15,
+    "featured_press": 15,
+    "fusion_international": 10,
+    "open_late": 10,
+    "craft_tags": ["craft beer", "beer garden", "gastropub", "taproom", "brewpub", "brewery"],
+    "drinks_tags": ["cocktail bar", "wine bar", "bar", "pub", "drinks-led", "speakeasy", "listening bar"],
+    "featured_sources": ["Michelin Guide", "BK Magazine"],
+    "fusion_tags": ["fusion", "international", "thai-western", "european", "italian", "french", "japanese", "german", "mediterranean", "western"],
+    "open_late_hour": 23
+  },
+  "score_hot_threshold": 70,
+  "fuzzy_match_threshold": 0.85,
+  "slack": {
+    "dm_user_id": "U06E0DL9Y3D",
+    "team_channel_id": "C0BFZ68S4G7"
+  },
+  "search_queries": [
+    "new bar opening Bangkok {year} Thonglor Ekkamai",
+    "new restaurant openings Bangkok {month} {year}",
+    "new craft beer bar taproom Bangkok opened {year}",
+    "new restaurant bar opening Ari Charoenkrung Silom Sathorn Bangkok {year}",
+    "bk.asia-city.com new openings Bangkok bars restaurants {year}",
+    "Michelin Guide Bangkok new additions restaurants {year}",
+    "Lifestyle Asia Bangkok new restaurants {month} {year}",
+    "ร้านเปิดใหม่ กรุงเทพ",
+    "บาร์เปิดใหม่ กรุงเทพ"
+  ],
+  "hashtag_watchlist": {
+    "tiktok": [
+      "https://www.tiktok.com/tag/bangkoknewbar",
+      "https://www.tiktok.com/tag/newrestaurantbangkok",
+      "https://www.tiktok.com/tag/%E0%B8%A3%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94%E0%B9%83%E0%B8%AB%E0%B8%A1%E0%B9%88",
+      "https://www.tiktok.com/tag/%E0%B8%9A%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94%E0%B9%83%E0%B8%AB%E0%B8%A1%E0%B9%88",
+      "https://www.tiktok.com/tag/%E0%B8%84%E0%B8%A3%E0%B8%B2%E0%B8%9F%E0%B8%97%E0%B9%8C%E0%B9%80%E0%B8%9A%E0%B8%B5%E0%B8%A2%E0%B8%A3%E0%B9%8C"
+    ],
+    "instagram": [
+      "https://www.instagram.com/explore/tags/bangkoknewbar/",
+      "https://www.instagram.com/explore/tags/newrestaurantbangkok/",
+      "https://www.instagram.com/explore/tags/%E0%B8%A3%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94%E0%B9%83%E0%B8%AB%E0%B8%A1%E0%B9%88/",
+      "https://www.instagram.com/explore/tags/%E0%B8%9A%E0%B8%B2%E0%B8%A3%E0%B9%8C%E0%B9%80%E0%B8%9B%E0%B8%B4%E0%B8%94%E0%B9%83%E0%B8%AB%E0%B8%A1%E0%B9%88/",
+      "https://www.instagram.com/explore/tags/%E0%B8%84%E0%B8%A3%E0%B8%B2%E0%B8%9F%E0%B8%97%E0%B9%8C%E0%B9%80%E0%B8%9A%E0%B8%B5%E0%B8%A2%E0%B8%A3%E0%B9%8C/"
+    ]
+  }
+}
