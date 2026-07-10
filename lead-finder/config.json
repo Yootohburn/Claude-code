@@ -18,17 +18,28 @@
     "four seasons", "capella", "st. regis", "st regis", "park hyatt",
     "waldorf", "okura", "carlton", "radisson", "holiday inn"
   ],
+  "portfolio": {
+    "brands": [
+      {"name": "Vana Brewing", "style": "Bangkok craft brewery", "url": "https://www.vanabrewing.com/"},
+      {"name": "Erdinger", "style": "German/Bavarian weissbier", "url": "https://erdinger.de/en-US"},
+      {"name": "Birra Moretti", "style": "Italian lager, food pairing / aperitivo", "url": "https://www.birramoretti.com/global/en/our-beers/"}
+    ]
+  },
   "scoring": {
     "craft_beer_concept": 30,
     "drinks_led": 20,
     "priority_area": 15,
     "featured_press": 15,
+    "portfolio_fit": 15,
     "fusion_international": 10,
     "open_late": 10,
+    "poor_fit_penalty": -20,
     "craft_tags": ["craft beer", "beer garden", "gastropub", "taproom", "brewpub", "brewery"],
     "drinks_tags": ["cocktail bar", "wine bar", "bar", "pub", "drinks-led", "speakeasy", "listening bar"],
     "featured_sources": ["Michelin Guide", "BK Magazine"],
+    "portfolio_tags": ["italian", "german", "bavarian", "european", "mediterranean", "french", "spanish", "tapas", "aperitivo", "wheat beer", "import beer", "beer garden", "craft beer", "taproom", "gastropub"],
     "fusion_tags": ["fusion", "international", "thai-western", "european", "italian", "french", "japanese", "german", "mediterranean", "western"],
+    "poor_fit_tags": ["thai pub", "live band pub", "mor lam", "luk thung"],
     "open_late_hour": 23
   },
   "score_hot_threshold": 70,

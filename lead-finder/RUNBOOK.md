@@ -101,8 +101,16 @@ hashtag URLs: #bangkoknewbar, #newrestaurantbangkok, #ร้านเปิด�
 | else: cocktail bar / wine bar / pub / drinks-led bistro | +20 |
 | Located in Thonglor / Ekkamai / Ari | +15 |
 | Featured in Michelin Guide or BK Magazine | +15 |
+| Portfolio fit — Vana (craft), Erdinger (German weissbier), Birra Moretti (Italian): italian / german / european / mediterranean / tapas / aperitivo / beer garden concepts | +15 |
 | Thai-Western fusion or international cuisine | +10 |
 | Open late (23:00 or later) | +10 |
+| Poor market fit (local Thai band-pub, mor lam / luk thung) | −20 |
+
+Portfolio brands live in `config.json → portfolio`; tune `portfolio_tags` /
+`poor_fit_tags` as the brand book evolves, then run
+`python3 lead_finder.py rescore` to recompute all scores. To drop a lead the
+team rejects: `python3 lead_finder.py cut "Venue Name" "reason"` (it stays in
+the DB as excluded so it never resurfaces).
 
 🔥 threshold: 70+ (`score_hot_threshold`). Hotel/hostel/resort venues are
 excluded outright (`exclude_keywords`). Venues older than ~3 months are skipped

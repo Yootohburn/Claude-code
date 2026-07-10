@@ -75,6 +75,14 @@ def score_venue(v: dict) -> tuple[int, list[str]]:
         score += s["featured_press"]
         reasons.append(f"featured press +{s['featured_press']}")
 
+    if any(t in hay for t in s.get("portfolio_tags", [])):
+        score += s.get("portfolio_fit", 0)
+        reasons.append(f"portfolio fit (Vana/Erdinger/Moretti) +{s.get('portfolio_fit', 0)}")
+
+    if any(t in hay for t in s.get("poor_fit_tags", [])):
+        score += s.get("poor_fit_penalty", 0)
+        reasons.append(f"poor market fit {s.get('poor_fit_penalty', 0)}")
+
     if any(t in hay for t in s["fusion_tags"]):
         score += s["fusion_international"]
         reasons.append(f"international/fusion +{s['fusion_international']}")
@@ -84,7 +92,7 @@ def score_venue(v: dict) -> tuple[int, list[str]]:
         score += s["open_late"]
         reasons.append(f"open late +{s['open_late']}")
 
-    return min(score, 100), reasons
+    return max(0, min(score, 100)), reasons
 
 
 def db_connect() -> sqlite3.Connection:
@@ -377,6 +385,29 @@ def main() -> None:
         last = con.execute("SELECT MAX(run_date) d FROM runs").fetchone()["d"]
         con.close()
         regenerate(last or today)
+    elif cmd == "rescore":
+        con = db_connect()
+        for r in con.execute("SELECT * FROM venues"):
+            v = {"name": r["name"], "area": r["area"], "concept": r["concept"],
+                 "tags": r["tags"].split(";") if r["tags"] else [],
+                 "featured": r["featured"].split(";") if r["featured"] else [],
+                 "hours_close": int(r["hours_close"]) if str(r["hours_close"]).isdigit() else None}
+            score, reasons = score_venue(v)
+            con.execute("UPDATE venues SET score=?, score_reasons=? WHERE id=?",
+                        (score, "; ".join(reasons), r["id"]))
+        con.commit()
+        con.close()
+        print("Rescored all venues with current config.")
+        regenerate(today if len(sys.argv) < 3 else sys.argv[2])
+    elif cmd == "cut":
+        name = sys.argv[2]
+        reason = sys.argv[3] if len(sys.argv) > 3 else "manual cut (market fit)"
+        con = db_connect()
+        n = con.execute("UPDATE venues SET excluded=1, exclude_reason=? WHERE name LIKE ?",
+                        (reason, f"%{name}%")).rowcount
+        con.commit()
+        con.close()
+        print(f"Cut {n} venue(s): {name}")
     elif cmd == "set-status":
         name, status = sys.argv[2], sys.argv[3].title()
         if status not in STATUSES:
