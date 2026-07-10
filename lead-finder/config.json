@@ -44,6 +44,8 @@
   },
   "score_hot_threshold": 70,
   "fuzzy_match_threshold": 0.85,
+  "follow_up_days": 14,
+  "new_untouched_days": 7,
   "slack": {
     "dm_user_id": "U06E0DL9Y3D",
     "team_channel_id": "C0BFZ68S4G7"

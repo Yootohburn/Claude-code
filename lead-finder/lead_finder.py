@@ -114,7 +114,32 @@ def db_connect() -> sqlite3.Connection:
         run_date TEXT PRIMARY KEY, ingested INTEGER, new_leads INTEGER,
         duplicates INTEGER, excluded INTEGER
     )""")
+    existing = {r[1] for r in con.execute("PRAGMA table_info(venues)")}
+    for col, decl in [("instagram", "TEXT"), ("review_count", "INTEGER"),
+                      ("last_touch", "TEXT"), ("next_action", "TEXT")]:
+        if col not in existing:
+            con.execute(f"ALTER TABLE venues ADD COLUMN {col} {decl}")
     return con
+
+
+def days_between(older: str, newer: str) -> int:
+    try:
+        return (date.fromisoformat(newer) - date.fromisoformat(older)).days
+    except (ValueError, TypeError):
+        return 0
+
+
+def follow_ups_due(leads: list[sqlite3.Row], run_date: str) -> list[tuple[sqlite3.Row, int, str]]:
+    """Leads that need attention: in-pipeline gone quiet, or New never contacted."""
+    due = []
+    for r in leads:
+        last = r["last_touch"] or r["first_seen"]
+        days = days_between(last, run_date)
+        if r["status"] in ("Contacted", "Meeting") and days >= CONFIG["follow_up_days"]:
+            due.append((r, days, f"{r['status'].lower()}, {days}d silent"))
+        elif r["status"] == "New" and days >= CONFIG["new_untouched_days"]:
+            due.append((r, days, f"never contacted, found {days}d ago"))
+    return sorted(due, key=lambda t: (-t[0]["score"], -t[1]))
 
 
 def find_duplicate(con: sqlite3.Connection, nname: str):
@@ -188,6 +213,10 @@ def ingest(raw_path: Path, run_date: str) -> dict:
              str(v.get("hours_close") or ""), ";".join(v.get("featured", [])),
              v.get("notes", ""), score, "; ".join(reasons), "New", run_date,
              excluded, reason))
+        if v.get("instagram") or v.get("review_count") is not None:
+            con.execute(
+                "UPDATE venues SET instagram=?, review_count=? WHERE norm_name=?",
+                (v.get("instagram", ""), v.get("review_count"), nname))
         if not excluded:
             stats["new"] += 1
 
@@ -208,10 +237,13 @@ def write_csv(leads: list[sqlite3.Row]) -> None:
     with (OUT_DIR / "leads.csv").open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["venue name", "area", "source", "date found",
-                    "google maps link", "phone", "score", "status"])
+                    "google maps link", "phone", "score", "status",
+                    "instagram", "last touch", "next action"])
         for r in leads:
             w.writerow([r["name"], r["area"], r["source"], r["first_seen"],
-                        r["maps_link"], r["phone"], r["score"], r["status"]])
+                        r["maps_link"], r["phone"], r["score"], r["status"],
+                        r["instagram"] or "", r["last_touch"] or "",
+                        r["next_action"] or ""])
 
 
 def slack_summary(leads: list[sqlite3.Row], run_date: str) -> str:
@@ -222,6 +254,13 @@ def slack_summary(leads: list[sqlite3.Row], run_date: str) -> str:
         fire = "🔥 " if r["score"] >= hot else ""
         lines.append(f"{fire}*{r['name']}* | {r['area'] or 'TBC'} | {r['score']} | "
                      f"{r['source']} | <{r['maps_link']}|Maps>")
+    due = follow_ups_due(leads, run_date)
+    if due:
+        lines += ["", f"⏰ *Follow-ups due ({len(due)})*"]
+        for r, _days, why in due[:5]:
+            lines.append(f"• {r['name']} ({r['area'] or 'TBC'}, {r['score']}) — {why}")
+        if len(due) > 5:
+            lines.append(f"…and {len(due) - 5} more in the report")
     text = "\n".join(lines)
     (OUT_DIR / "slack_summary.txt").write_text(text, encoding="utf-8")
     return text
@@ -246,8 +285,13 @@ def write_report(con: sqlite3.Connection, leads: list[sqlite3.Row], run_date: st
     def row_html(r):
         fire = "🔥 " if r["score"] >= hot else ""
         feat = f'<span class="chip">{esc(r["featured"].replace(";", ", "))}</span>' if r["featured"] else ""
+        if not r["opening_date"]:
+            feat += ' <span class="chip warn">⚠ verify date</span>'
+        ig = (f' · <a href="https://www.instagram.com/{esc(r["instagram"]).lstrip("@")}/"'
+              f' target="_blank">@{esc(r["instagram"]).lstrip("@")}</a>') if r["instagram"] else ""
+        touch = f'<div class="sub">last touch {esc(r["last_touch"])}</div>' if r["last_touch"] else ""
         return f"""<tr>
-<td class="vname">{fire}{esc(r['name'])}<div class="sub">{esc(r['concept'])}</div></td>
+<td class="vname">{fire}{esc(r['name'])}<div class="sub">{esc(r['concept'])}{ig}</div>{touch}</td>
 <td>{esc(r['area'] or 'TBC')}</td>
 <td>{bar(r['score'])}</td>
 <td>{esc(r['source'])} {feat}</td>
@@ -277,6 +321,16 @@ def write_report(con: sqlite3.Connection, leads: list[sqlite3.Row], run_date: st
                     for u in CONFIG["hashtag_watchlist"]["instagram"])
     hot_count = sum(1 for r in leads if r["score"] >= hot)
     excluded_count = con.execute("SELECT COUNT(*) c FROM venues WHERE excluded=1").fetchone()["c"]
+    pipeline_count = sum(1 for r in leads if r["status"] in ("Contacted", "Meeting"))
+    due = follow_ups_due(leads, run_date)
+
+    due_section = ""
+    if due:
+        due_rows = "".join(
+            f'<li><b>{esc(r["name"])}</b> ({esc(r["area"] or "TBC")}, score {r["score"]}) '
+            f'— {esc(why)}</li>' for r, _d, why in due)
+        due_section = (f'<div class="newweek due"><h2>⏰ Follow-ups due ({len(due)})</h2>'
+                       f'<ul class="duelist">{due_rows}</ul></div>')
 
     page = f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
@@ -316,6 +370,12 @@ tr:hover td {{ background:var(--surface2); }}
 .fill {{ height:100%; background:var(--amber); border-radius:4px; }}
 .fill.hot {{ background:var(--hot); }}
 .chip {{ background:var(--surface2); border:1px solid var(--line); border-radius:20px; padding:1px 8px; font-size:11.5px; color:var(--ink2); }}
+.chip.warn {{ color:var(--amber); border-color:var(--amber-soft); }}
+.newweek.due {{ border-color:#7a4a35; background:linear-gradient(180deg,#1d1512,var(--surface)); }}
+.newweek.due h2 {{ color:var(--hot); }}
+.duelist {{ list-style:none; }}
+.duelist li {{ margin:6px 0; color:var(--ink2); }}
+.duelist b {{ color:var(--ink); }}
 .status {{ border-radius:20px; padding:2px 9px; font-size:12px; border:1px solid var(--line); }}
 .s-new {{ color:var(--amber); border-color:var(--amber-soft); }}
 .s-contacted {{ color:var(--link); }}
@@ -337,8 +397,12 @@ footer {{ color:var(--muted); font-size:12.5px; margin-top:36px; }}
   <div class="tile"><div class="n">{len(new)}</div><div class="l">New this week</div></div>
   <div class="tile"><div class="n">{len(leads)}</div><div class="l">Active leads (all time)</div></div>
   <div class="tile"><div class="n">{hot_count}</div><div class="l">Hot (score {hot}+)</div></div>
-  <div class="tile"><div class="n">{excluded_count}</div><div class="l">Hotel venues excluded</div></div>
+  <div class="tile"><div class="n">{pipeline_count}</div><div class="l">In pipeline (Contacted/Meeting)</div></div>
+  <div class="tile"><div class="n">{len(due)}</div><div class="l">Follow-ups due</div></div>
+  <div class="tile"><div class="n">{excluded_count}</div><div class="l">Excluded (hotel/cut)</div></div>
 </div>
+
+{due_section}
 
 <div class="newweek">
 <h2>🆕 New this week — {run_date}</h2>
@@ -413,11 +477,32 @@ def main() -> None:
         if status not in STATUSES:
             sys.exit(f"Status must be one of {STATUSES}")
         con = db_connect()
-        n = con.execute("UPDATE venues SET status=? WHERE name LIKE ?",
-                        (status, f"%{name}%")).rowcount
+        n = con.execute(
+            "UPDATE venues SET status=?, last_touch=? WHERE name LIKE ?",
+            (status, today, f"%{name}%")).rowcount
         con.commit()
         con.close()
         print(f"Updated {n} venue(s) to {status}")
+    elif cmd == "log":
+        # log "name" "note" [status] [next-action] — records a sales touch
+        name, note = sys.argv[2], sys.argv[3]
+        status = sys.argv[4].title() if len(sys.argv) > 4 else None
+        nxt = sys.argv[5] if len(sys.argv) > 5 else None
+        if status and status not in STATUSES:
+            sys.exit(f"Status must be one of {STATUSES}")
+        con = db_connect()
+        row = con.execute("SELECT id, notes, status FROM venues WHERE name LIKE ?",
+                          (f"%{name}%",)).fetchone()
+        if not row:
+            sys.exit(f"No venue matching {name!r}")
+        notes = (row["notes"] + "\n" if row["notes"] else "") + f"[{today}] {note}"
+        con.execute(
+            "UPDATE venues SET notes=?, last_touch=?, status=?, next_action=? WHERE id=?",
+            (notes, today, status or row["status"], nxt, row["id"]))
+        con.commit()
+        con.close()
+        print(f"Logged touch on venue #{row['id']} ({today})"
+              + (f", status → {status}" if status else ""))
     else:
         print(__doc__)
         sys.exit(1)

@@ -11,7 +11,9 @@ Slack MCP connector.
 
 ## 1. How to run it weekly
 
-Just tell Claude:
+**It runs itself**: a Routine ("Beervana lead-finder: weekly run") fires every
+**Monday ~09:40 Bangkok time**, does the full research run, and DMs you the
+approval summary. You can also trigger it any time by telling Claude:
 
 > **"run the lead finder"**
 
@@ -39,10 +41,24 @@ Other commands:
 ```bash
 python3 lead_finder.py report                      # regenerate outputs from DB only
 python3 lead_finder.py set-status "Sala Saneha" Contacted   # New/Contacted/Meeting/Closed
+python3 lead_finder.py log "Sala Saneha" "met GM, wants Vana samples" Meeting "send samples Fri"
+python3 lead_finder.py cut "Venue" "reason"        # blacklist a rejected lead
+python3 lead_finder.py rescore                     # recompute scores after config changes
 ```
 
 First run builds the baseline; from run 2 onward only never-seen venues count as
 "new this week".
+
+### Follow-up engine
+
+Every report and DM summary includes a **Follow-ups due** section:
+- leads in *Contacted*/*Meeting* with no logged touch for `follow_up_days`
+  (default 14) days
+- *New* leads never contacted after `new_untouched_days` (default 7) days
+
+`log` records a touch (dated note, last-touch date, optional status +
+next action), which resets the clock. Log touches straight from Slack DM —
+see §4.
 
 ## 2. Connecting the Slack MCP (if not yet connected)
 
@@ -86,12 +102,19 @@ Slack cannot push your DM reply into a Claude Code session — there is no
 Slack-event → session trigger today, and the @Claude Slack app starts separate
 channel-based sessions with none of this project's context. Instead, a
 **Routine** ("Beervana lead-finder: Slack DM approval poller",
-`trig_019dPmpdqyC2ZyisXCTUEoCb`) wakes this session **hourly at :03,
-09:00–23:00 Bangkok time**, reads the DM, and acts on whatever it finds:
+`trig_01V3CgC4TNtzV3pfbQJRDEXD`) wakes this session **hourly at :03,
+09:00–23:00 Bangkok time**, reads the DM, and acts on whatever it finds
+(a second Routine, "Beervana lead-finder: weekly run"
+`trig_014AmFZUt9UDAwVCvB2A6oPF`, fires the full research run every Monday
+~09:40 Bangkok):
 
 - "ok" / "post it" → posts the pending summary to the team channel
 - "remove #N" / "cut X" / "add venue Y" → applies edits, re-sends revised DM
 - "run the lead finder" → kicks off the full weekly run
+- sales logging: "contacted Sala Saneha", "meeting with Silo Friday, bring
+  Moretti samples", "closed Hannibal", "note Liana: GM is Khun Ploy" →
+  recorded via `lead_finder.py log` (status + dated note + next action),
+  which feeds the follow-up engine
 - no reply → does nothing, silently
 
 So a Slack-only reply is acted on within the hour. Typing in the Claude Code
