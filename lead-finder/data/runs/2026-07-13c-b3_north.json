@@ -1,0 +1,24 @@
+[
+  {
+    "name": "The 1925 Brewing Co.",
+    "area": "Lat Phrao",
+    "address": "G Floor, Ladprao Hills, Ladprao Soi 4 (MRT Phahonyothin exit 1)",
+    "concept": "Gastropub with 70+ imported craft beers on tap, paired with Asian food; open day and night",
+    "tags": ["craft beer", "gastropub", "taproom", "import beer"],
+    "source": "Wongnai (Thai)",
+    "source_url": "https://www.wongnai.com/reviews/bbeb2ec7974244a99aaf4e4939c17141",
+    "instagram": "", "opening_date": "", "phone": "095 825 1925", "hours_close": 24, "featured": [],
+    "notes": "B3 backlog (North / Lat Phrao–Phahonyothin). 70+ import taps = high-volume account already sourcing craft; strong Erdinger/Moretti import pitch. Phone on file. Open 11:00-00:00 daily."
+  },
+  {
+    "name": "Bros Brew Beers",
+    "area": "Lat Phrao",
+    "address": "Ha Yaek Ladprao (five-junction), near MRT Phahonyothin exit 2",
+    "concept": "New craft beer bar at Ha Yaek Ladprao — Thai + imported beer (bottle & tap), daily live music, full food menu",
+    "tags": ["craft beer", "bar", "taproom", "drinks-led"],
+    "source": "Wongnai (Thai)",
+    "source_url": "https://www.wongnai.com/restaurants/277315hh-bros-brew-beers-ladprao",
+    "instagram": "", "opening_date": "", "phone": "", "hours_close": 24, "featured": [],
+    "notes": "B3 backlog (North). Craft beer bar with live music (not a Thai-band pub). Central Ha Yaek Ladprao location, easy transport. Verify opening date + tap list."
+  }
+]

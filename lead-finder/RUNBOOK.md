@@ -60,6 +60,48 @@ Every report and DM summary includes a **Follow-ups due** section:
 next action), which resets the clock. Log touches straight from Slack DM —
 see §4.
 
+## 1b. Rep zones & per-zone coverage
+
+Leads are grouped into **5 sales-rep territories** (B1–B5) defined in
+`config.json → zones` by area lists. The report, CSV and Slack summary group by
+zone and flag any zone below `coverage.target_leads_per_zone` (default 2), so no
+rep's patch goes uncovered.
+
+- **B4** (East/SE: Ekkamai, Phra Khanong, On Nut, Udomsuk, Bangna, Srinakarin,
+  Samut Prakan) and **B5** (Nonthaburi, Ratchapruek, Rangsit, Pathum Thani,
+  Pak Kret) are set exactly as specified.
+- **B1–B3 are PROVISIONAL** (the MyMaps couldn't be read automatically). To
+  correct: edit the `areas` list of a zone in `config.json`, then
+  `python3 lead_finder.py remap-zones` — it re-maps every venue and regenerates.
+- Outer zones (Bangna, Nonthaburi, Rangsit, etc.) are NOT covered by the English
+  press — the weekly run must use the **Thai per-zone queries** in each zone's
+  `search_terms_th` (Wongnai, Lemon8, Retty, Facebook, Future Park/mall "what's
+  new" pages). That is how those zones get filled.
+- Freshness = **new-to-DB** (`freshness_mode`): any venue not already in the DB
+  and not yet contacted is a valid lead; genuinely just-opened venues also get a
+  🆕 flag. This guarantees per-zone volume even where nothing opened this month.
+
+## 1c. Verification (MANDATORY — do this before adding any venue)
+
+Listicles and old reviews (Wongnai/Lemon8 "best of") include venues that closed
+years ago. **A listing is not proof a venue is open.** Before a venue enters the
+lead list:
+
+1. Search the venue name + area + a current-status term (`เปิดอยู่ไหม`, `ปิด`,
+   `รีวิว 2569`, current year). Look for: recent (this-year) reviews/posts, an
+   active Facebook/IG, an opening announcement, or a mall "now open" page.
+2. Reject anything with a "permanently closed / ปิดถาวร" signal or no activity
+   for 12+ months (hold as unverified rather than presenting it as a lead).
+3. Record `"verified": "YYYY-MM-DD"` on the venue (JSON field or set later). The
+   report shows a green **✓ open · checked DATE** badge; unverified venues show
+   **⚠ verify open/date**.
+
+Note: this environment cannot open Google Maps directly (network-blocked), so
+verification is via current web signals; the rep should still confirm on Maps /
+by phone before a site visit. If a bad venue slips through, cut it:
+`python3 lead_finder.py cut "Name" "permanently closed"` — it's blacklisted and
+never resurfaces.
+
 ## 2. Connecting the Slack MCP (if not yet connected)
 
 On claude.ai / Claude Code web, enable the **Slack connector** in

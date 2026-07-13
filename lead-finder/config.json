@@ -1,11 +1,46 @@
 {
   "project": "Beervana — Bangkok New Venue Lead Finder",
   "city": "Bangkok",
-  "target_areas": [
-    "Thonglor", "Ekkamai", "Ari", "Silom", "Sathorn", "Sukhumvit",
-    "Charoenkrung", "Yaowarat", "Phra Khanong", "On Nut", "Udomsuk",
-    "Ploenchit", "Chidlom", "Old Town", "Banglamphu"
-  ],
+  "_zones_note": "5 sales-rep territories. B4/B5 areas are exactly as Yoo specified. B1-B3 are a PROVISIONAL geographic split (Yoo's MyMaps could not be read automatically) — correct any area's zone and re-run; mapping is by the 'areas' lists below.",
+  "zones": {
+    "B1": {
+      "rep_area": "Lower Sukhumvit / CBD",
+      "provisional": true,
+      "areas": ["Sukhumvit", "Asok", "Nana", "Phrom Phong", "Thonglor", "Ploenchit", "Chidlom", "Ratchaprasong", "Ratchadamri"],
+      "search_terms_th": ["ร้านเปิดใหม่ สุขุมวิท ทองหล่อ", "บาร์ คราฟท์เบียร์ เปิดใหม่ ทองหล่อ อโศก"]
+    },
+    "B2": {
+      "rep_area": "Silom / Sathorn / Riverside / Old Town",
+      "provisional": true,
+      "areas": ["Silom", "Sathorn", "Bang Rak", "Charoenkrung", "Yaowarat", "Old Town", "Banglamphu", "Riverside"],
+      "search_terms_th": ["ร้านเปิดใหม่ สีลม สาทร เจริญกรุง", "บาร์ คราฟท์เบียร์ เปิดใหม่ เยาวราช"]
+    },
+    "B3": {
+      "rep_area": "North Bangkok",
+      "provisional": true,
+      "areas": ["Ari", "Phaya Thai", "Ratchathewi", "Chatuchak", "Lat Phrao", "Sanam Pao", "Saphan Khwai"],
+      "search_terms_th": ["ร้านเปิดใหม่ อารีย์ พหลโยธิน", "บาร์ คราฟท์เบียร์ เปิดใหม่ อารีย์ ลาดพร้าว"]
+    },
+    "B4": {
+      "rep_area": "East / Southeast (Ekkamai → Samut Prakan)",
+      "provisional": false,
+      "areas": ["Ekkamai", "Phra Khanong", "On Nut", "Udomsuk", "Bangna", "Srinakarin", "Bearing", "Samut Prakan", "Bang Na"],
+      "search_terms_th": ["ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ บางนา", "ร้านเปิดใหม่ พระโขนง อ่อนนุช บาร์ บิสโทร", "ร้านอาหารเปิดใหม่ สมุทรปราการ บาร์ คราฟท์เบียร์"]
+    },
+    "B5": {
+      "rep_area": "North / West suburbs",
+      "provisional": false,
+      "areas": ["Nonthaburi", "Ratchapruek", "Rangsit", "Pathum Thani", "Pak Kret", "Chaengwatthana", "Thanyaburi"],
+      "search_terms_th": ["ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ นนทบุรี ราชพฤกษ์", "ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ รังสิต ฟิวเจอร์พาร์ค", "ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ ปทุมธานี"]
+    }
+  },
+  "coverage": {
+    "min_leads_per_zone": 1,
+    "target_leads_per_zone": 2,
+    "note": "Weekly run should surface at least target_leads_per_zone uncontacted leads per zone; report flags any zone below min."
+  },
+  "freshness_mode": "new_to_db",
+  "_freshness_note": "new_to_db: any venue not already in the SQLite DB and not yet contacted counts as a lead (Yoo's choice for low-press outer zones). Opening date is informational — venues opened <3 months get a 🆕 flag but old-but-uncontacted craft venues are still valid leads.",
   "priority_areas": ["Thonglor", "Ekkamai", "Ari"],
   "recency_months": 3,
   "low_review_count_threshold": 150,

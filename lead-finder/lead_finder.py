@@ -5,10 +5,16 @@ Pipeline: ingest researched venues (JSON) + manual adds (CSV)
   -> hotel/area filters -> fuzzy dedupe against SQLite memory
   -> score for craft beer fit -> leads.csv + report.html + slack_summary.txt
 
+Venues are grouped into 5 sales-rep zones (B1-B5, see config.json 'zones').
+The report + Slack summary show per-zone coverage vs target so no rep's
+territory goes uncovered.
+
 Usage:
   python3 lead_finder.py ingest data/runs/2026-07-10-raw_venues.json
   python3 lead_finder.py report            # regenerate outputs from DB only
+  python3 lead_finder.py remap-zones       # re-apply zone map after editing config
   python3 lead_finder.py set-status "Venue Name" Contacted
+  python3 lead_finder.py log "Venue" "note" [Status] [next action]
 """
 
 import csv
@@ -43,6 +49,21 @@ def norm_name(name: str) -> str:
 def is_hotel_venue(v: dict) -> bool:
     hay = f"{v.get('name', '')} {v.get('address', '')}".lower()
     return any(k in hay for k in CONFIG["exclude_keywords"])
+
+
+ZONES = CONFIG.get("zones", {})
+
+
+def zone_for_area(area: str) -> tuple[str, str]:
+    """Map a venue's area to (zone_key, rep_area_label). Falls back to unassigned."""
+    a = (area or "").strip().lower()
+    if a:
+        for zkey, z in ZONES.items():
+            for zarea in z.get("areas", []):
+                za = zarea.lower()
+                if a == za or za in a or a in za:
+                    return zkey, z.get("rep_area", "")
+    return "—", "Unassigned"
 
 
 def maps_link(v: dict) -> str:
@@ -116,10 +137,27 @@ def db_connect() -> sqlite3.Connection:
     )""")
     existing = {r[1] for r in con.execute("PRAGMA table_info(venues)")}
     for col, decl in [("instagram", "TEXT"), ("review_count", "INTEGER"),
-                      ("last_touch", "TEXT"), ("next_action", "TEXT")]:
+                      ("last_touch", "TEXT"), ("next_action", "TEXT"),
+                      ("zone", "TEXT"), ("rep_area", "TEXT"), ("verified", "TEXT")]:
         if col not in existing:
             con.execute(f"ALTER TABLE venues ADD COLUMN {col} {decl}")
     return con
+
+
+def is_recent(opening_date: str, run_date: str) -> bool:
+    """True if the venue opened within recency_months (for the 🆕 flag). Unknown -> False."""
+    od = (opening_date or "").strip()
+    if not od or len(od) < 4:
+        return False
+    months = CONFIG.get("recency_months", 3)
+    try:
+        y = int(od[:4])
+        m = int(od[5:7]) if len(od) >= 7 else 1
+        d = int(od[8:10]) if len(od) >= 10 else 1
+        opened = date(y, m, d)
+        return days_between(opened.isoformat(), run_date) <= months * 31
+    except (ValueError, TypeError):
+        return False
 
 
 def days_between(older: str, newer: str) -> int:
@@ -140,6 +178,27 @@ def follow_ups_due(leads: list[sqlite3.Row], run_date: str) -> list[tuple[sqlite
         elif r["status"] == "New" and days >= CONFIG["new_untouched_days"]:
             due.append((r, days, f"never contacted, found {days}d ago"))
     return sorted(due, key=lambda t: (-t[0]["score"], -t[1]))
+
+
+def zone_coverage(leads: list[sqlite3.Row]) -> dict:
+    """Per-zone active (uncontacted 'New') lead counts + gap flags vs config targets."""
+    cov = CONFIG.get("coverage", {})
+    target = cov.get("target_leads_per_zone", 2)
+    minimum = cov.get("min_leads_per_zone", 1)
+    out = {}
+    for zkey, z in ZONES.items():
+        zleads = [r for r in leads if r["zone"] == zkey]
+        actionable = [r for r in zleads if r["status"] == "New"]
+        out[zkey] = {
+            "rep_area": z.get("rep_area", ""),
+            "provisional": z.get("provisional", False),
+            "total": len(zleads),
+            "actionable": len(actionable),
+            "below_min": len(actionable) < minimum,
+            "below_target": len(actionable) < target,
+            "target": target,
+        }
+    return out
 
 
 def find_duplicate(con: sqlite3.Connection, nname: str):
@@ -200,23 +259,27 @@ def ingest(raw_path: Path, run_date: str) -> dict:
             excluded, reason = 1, "hotel/hostel/resort keyword"
             stats["excluded"] += 1
         score, reasons = score_venue(v)
+        zkey, rep_area = zone_for_area(v.get("area", ""))
         con.execute(
             """INSERT INTO venues (name, norm_name, area, address, concept, tags,
                source, source_url, maps_link, phone, opening_date, hours_close,
                featured, notes, score, score_reasons, status, first_seen,
-               excluded, exclude_reason)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+               excluded, exclude_reason, zone, rep_area)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (v["name"], nname, v.get("area", ""), v.get("address", ""),
              v.get("concept", ""), ";".join(v.get("tags", [])),
              v.get("source", ""), v.get("source_url", ""), maps_link(v),
              v.get("phone", ""), v.get("opening_date", ""),
              str(v.get("hours_close") or ""), ";".join(v.get("featured", [])),
              v.get("notes", ""), score, "; ".join(reasons), "New", run_date,
-             excluded, reason))
+             excluded, reason, zkey, rep_area))
         if v.get("instagram") or v.get("review_count") is not None:
             con.execute(
                 "UPDATE venues SET instagram=?, review_count=? WHERE norm_name=?",
                 (v.get("instagram", ""), v.get("review_count"), nname))
+        if v.get("verified"):
+            con.execute("UPDATE venues SET verified=? WHERE norm_name=?",
+                        (v.get("verified"), nname))
         if not excluded:
             stats["new"] += 1
 
@@ -236,29 +299,53 @@ def write_csv(leads: list[sqlite3.Row]) -> None:
     OUT_DIR.mkdir(exist_ok=True)
     with (OUT_DIR / "leads.csv").open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["venue name", "area", "source", "date found",
+        w.writerow(["zone", "rep area", "venue name", "area", "source", "date found",
                     "google maps link", "phone", "score", "status",
                     "instagram", "last touch", "next action"])
-        for r in leads:
-            w.writerow([r["name"], r["area"], r["source"], r["first_seen"],
-                        r["maps_link"], r["phone"], r["score"], r["status"],
-                        r["instagram"] or "", r["last_touch"] or "",
+        for r in sorted(leads, key=lambda r: (r["zone"], -r["score"])):
+            w.writerow([r["zone"], r["rep_area"], r["name"], r["area"], r["source"],
+                        r["first_seen"], r["maps_link"], r["phone"], r["score"],
+                        r["status"], r["instagram"] or "", r["last_touch"] or "",
                         r["next_action"] or ""])
 
 
 def slack_summary(leads: list[sqlite3.Row], run_date: str) -> str:
     new = [r for r in leads if r["first_seen"] == run_date]
     hot = CONFIG["score_hot_threshold"]
-    lines = [f"🍺 *New Leads This Week ({len(new)} found)* — reply 'ok' to post to the team channel", ""]
-    for r in sorted(new, key=lambda r: -r["score"])[:10]:
-        fire = "🔥 " if r["score"] >= hot else ""
-        lines.append(f"{fire}*{r['name']}* | {r['area'] or 'TBC'} | {r['score']} | "
-                     f"{r['source']} | <{r['maps_link']}|Maps>")
+    cov = zone_coverage(leads)
+    lines = [f"🍺 *New Leads This Week ({len(new)} found)* — reply 'ok' to post to the team channel",
+             "_Grouped by rep zone. 🔥 = 70+, 🆕 = opened <3 months._", ""]
+
+    # Top new leads grouped by zone, so every rep sees their patch
+    by_zone: dict[str, list[sqlite3.Row]] = {}
+    for r in sorted(new, key=lambda r: -r["score"]):
+        by_zone.setdefault(r["zone"], []).append(r)
+    for zkey in list(ZONES.keys()) + ["—"]:
+        zrows = by_zone.get(zkey, [])
+        if not zrows:
+            continue
+        label = ZONES.get(zkey, {}).get("rep_area", "Unassigned")
+        prov = " (provisional)" if ZONES.get(zkey, {}).get("provisional") else ""
+        lines.append(f"*{zkey} · {label}{prov}*")
+        for r in zrows[:3]:
+            fire = "🔥 " if r["score"] >= hot else ""
+            fresh = "🆕 " if is_recent(r["opening_date"], run_date) else ""
+            lines.append(f"  {fire}{fresh}{r['name']} | {r['area'] or 'TBC'} | {r['score']} | "
+                         f"{r['source']} | <{r['maps_link']}|Maps>")
+        lines.append("")
+
+    # Coverage gaps — which reps have thin pipelines
+    gaps = [f"{zk} ({c['actionable']}/{c['target']})" for zk, c in cov.items() if c["below_target"]]
+    if gaps:
+        lines.append(f"⚠️ *Zones below target ({', '.join(gaps)})* — need more research or manual adds.")
+    else:
+        lines.append("✅ *All 5 zones at target.*")
+
     due = follow_ups_due(leads, run_date)
     if due:
         lines += ["", f"⏰ *Follow-ups due ({len(due)})*"]
         for r, _days, why in due[:5]:
-            lines.append(f"• {r['name']} ({r['area'] or 'TBC'}, {r['score']}) — {why}")
+            lines.append(f"• {r['name']} ({r['zone']}/{r['area'] or 'TBC'}, {r['score']}) — {why}")
         if len(due) > 5:
             lines.append(f"…and {len(due) - 5} more in the report")
     text = "\n".join(lines)
@@ -269,9 +356,7 @@ def slack_summary(leads: list[sqlite3.Row], run_date: str) -> str:
 def write_report(con: sqlite3.Connection, leads: list[sqlite3.Row], run_date: str) -> None:
     hot = CONFIG["score_hot_threshold"]
     new = [r for r in leads if r["first_seen"] == run_date]
-    areas: dict[str, list[sqlite3.Row]] = {}
-    for r in leads:
-        areas.setdefault(r["area"] or "Area TBC", []).append(r)
+    cov = zone_coverage(leads)
 
     def esc(s):
         return html.escape(str(s or ""))
@@ -284,9 +369,13 @@ def write_report(con: sqlite3.Connection, leads: list[sqlite3.Row], run_date: st
 
     def row_html(r):
         fire = "🔥 " if r["score"] >= hot else ""
+        fresh = '<span class="chip new">🆕 new</span> ' if is_recent(r["opening_date"], run_date) else ""
         feat = f'<span class="chip">{esc(r["featured"].replace(";", ", "))}</span>' if r["featured"] else ""
-        if not r["opening_date"]:
-            feat += ' <span class="chip warn">⚠ verify date</span>'
+        if r["verified"]:
+            feat += f' <span class="chip ok">✓ open · checked {esc(r["verified"])}</span>'
+        elif not r["opening_date"]:
+            feat += ' <span class="chip warn">⚠ verify open/date</span>'
+        feat = fresh + feat
         ig = (f' · <a href="https://www.instagram.com/{esc(r["instagram"]).lstrip("@")}/"'
               f' target="_blank">@{esc(r["instagram"]).lstrip("@")}</a>') if r["instagram"] else ""
         touch = f'<div class="sub">last touch {esc(r["last_touch"])}</div>' if r["last_touch"] else ""
@@ -308,12 +397,22 @@ def write_report(con: sqlite3.Connection, leads: list[sqlite3.Row], run_date: st
 <th>Found</th><th>Phone</th><th>Status</th><th>Map</th></tr></thead>
 <tbody>{body}</tbody></table></div>"""
 
-    area_sections = ""
-    for area in sorted(areas, key=lambda a: -max(r["score"] for r in areas[a])):
-        rows = areas[area]
-        area_sections += (f'<section><h2>{esc(area)} '
-                          f'<span class="count">{len(rows)} venue{"s" if len(rows) != 1 else ""}</span></h2>'
-                          f'{table(rows)}</section>')
+    zone_sections = ""
+    for zkey, z in ZONES.items():
+        rows = sorted([r for r in leads if r["zone"] == zkey], key=lambda r: -r["score"])
+        c = cov[zkey]
+        badge = ("✅" if not c["below_target"] else ("⚠️" if not c["below_min"] else "🔴"))
+        prov = ' <span class="chip warn">provisional</span>' if c["provisional"] else ""
+        head = (f'<section><h2>{esc(zkey)} · {esc(z.get("rep_area", ""))}{prov} '
+                f'<span class="count">{badge} {c["actionable"]} actionable / target {c["target"]}'
+                f' · {len(rows)} total</span></h2>')
+        zone_sections += head + (table(rows) if rows else
+                                 '<p class="empty">No leads yet — research gap.</p>') + '</section>'
+    # any venues whose area didn't map to a zone
+    unz = sorted([r for r in leads if r["zone"] == "—"], key=lambda r: -r["score"])
+    if unz:
+        zone_sections += (f'<section><h2>Unassigned <span class="count">{len(unz)} — '
+                          f'area not in any zone; fix zone mapping</span></h2>{table(unz)}</section>')
 
     tiktok = "".join(f'<li><a href="{u}" target="_blank">{esc(u)}</a></li>'
                      for u in CONFIG["hashtag_watchlist"]["tiktok"])
@@ -371,6 +470,17 @@ tr:hover td {{ background:var(--surface2); }}
 .fill.hot {{ background:var(--hot); }}
 .chip {{ background:var(--surface2); border:1px solid var(--line); border-radius:20px; padding:1px 8px; font-size:11.5px; color:var(--ink2); }}
 .chip.warn {{ color:var(--amber); border-color:var(--amber-soft); }}
+.chip.new {{ color:#9ac97f; border-color:#3f5a34; }}
+.chip.ok {{ color:#7fc08f; border-color:#3f5a34; }}
+.coverage {{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:28px; }}
+.zchip {{ flex:1; min-width:150px; background:var(--surface); border:1px solid var(--line); border-left-width:3px; border-radius:8px; padding:8px 12px; font-size:12.5px; color:var(--ink2); }}
+.zchip b {{ color:var(--ink); margin-right:6px; }}
+.zchip .zc {{ float:right; font-variant-numeric:tabular-nums; color:var(--ink); }}
+.zchip.ok {{ border-left-color:#5f9a4f; }}
+.zchip.warn {{ border-left-color:var(--amber); }}
+.zchip.bad {{ border-left-color:var(--hot); }}
+.zonehead {{ font-size:15px; color:var(--ink2); margin-bottom:14px; text-transform:uppercase; letter-spacing:.06em; }}
+.empty {{ color:var(--muted); font-size:13px; padding:6px 2px; }}
 .newweek.due {{ border-color:#7a4a35; background:linear-gradient(180deg,#1d1512,var(--surface)); }}
 .newweek.due h2 {{ color:var(--hot); }}
 .duelist {{ list-style:none; }}
@@ -402,6 +512,11 @@ footer {{ color:var(--muted); font-size:12.5px; margin-top:36px; }}
   <div class="tile"><div class="n">{excluded_count}</div><div class="l">Excluded (hotel/cut)</div></div>
 </div>
 
+<div class="coverage">{"".join(
+  f'<div class="zchip {"ok" if not cov[zk]["below_target"] else ("warn" if not cov[zk]["below_min"] else "bad")}">'
+  f'<b>{zk}</b> {esc(cov[zk]["rep_area"])}<span class="zc">{cov[zk]["actionable"]}/{cov[zk]["target"]}</span></div>'
+  for zk in ZONES)}</div>
+
 {due_section}
 
 <div class="newweek">
@@ -409,7 +524,8 @@ footer {{ color:var(--muted); font-size:12.5px; margin-top:36px; }}
 {table(sorted(new, key=lambda r: -r["score"])) if new else "<p>No new venues this run.</p>"}
 </div>
 
-{area_sections}
+<h2 class="zonehead">Leads by rep zone</h2>
+{zone_sections}
 
 <section><h2>📱 TikTok / Instagram watchlist (manual review → manual_adds.csv)</h2>
 <div class="watch">
@@ -422,8 +538,18 @@ footer {{ color:var(--muted); font-size:12.5px; margin-top:36px; }}
     (OUT_DIR / "report.html").write_text(page, encoding="utf-8")
 
 
+def backfill_zones(con: sqlite3.Connection) -> None:
+    """(Re)compute zone + rep_area for every venue from current config."""
+    for r in con.execute("SELECT id, area FROM venues"):
+        zkey, rep_area = zone_for_area(r["area"])
+        con.execute("UPDATE venues SET zone=?, rep_area=? WHERE id=?",
+                    (zkey, rep_area, r["id"]))
+    con.commit()
+
+
 def regenerate(run_date: str) -> None:
     con = db_connect()
+    backfill_zones(con)
     leads = fetch_leads(con)
     write_csv(leads)
     write_report(con, leads, run_date)
@@ -449,6 +575,19 @@ def main() -> None:
         last = con.execute("SELECT MAX(run_date) d FROM runs").fetchone()["d"]
         con.close()
         regenerate(last or today)
+    elif cmd == "remap-zones":
+        # re-apply zone mapping after editing config.json 'zones'
+        con = db_connect()
+        backfill_zones(con)
+        for zk, z in ZONES.items():
+            n = con.execute("SELECT COUNT(*) c FROM venues WHERE zone=? AND excluded=0",
+                            (zk,)).fetchone()["c"]
+            print(f"  {zk} {z.get('rep_area','')}: {n} leads")
+        un = con.execute("SELECT COUNT(*) c FROM venues WHERE zone='—' AND excluded=0").fetchone()["c"]
+        if un:
+            print(f"  Unassigned: {un} (areas not matched to any zone)")
+        con.close()
+        regenerate(today)
     elif cmd == "rescore":
         con = db_connect()
         for r in con.execute("SELECT * FROM venues"):
