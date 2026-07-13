@@ -1,0 +1,47 @@
+[
+  {
+    "name": "Cherry Olive Cocktail Club",
+    "area": "Silom",
+    "address": "Convent Rd, Silom, Bang Rak",
+    "concept": "Cocktail club from established Thai bar-scene names; modern-playful + classic cocktails",
+    "tags": ["cocktail bar", "bar", "drinks-led"],
+    "source": "Friday Club Mag / Time Out",
+    "source_url": "https://www.fridayclubmag.com/cherry-olive-cocktail-club-is-the-new-silom-bar-to-know-now/",
+    "instagram": "",
+    "opening_date": "2026",
+    "phone": "",
+    "hours_close": 24,
+    "featured": [],
+    "notes": "New Silom/Convent cocktail bar (mid-2026). Drinks-led; cocktail-forward so craft angle is secondary — pitch Moretti/Erdinger as bottle/tap alongside the cocktail list. Confirm hours + exact address."
+  },
+  {
+    "name": "Sasa Khaotom Bar",
+    "area": "Thonglor",
+    "address": "2F Market Place Thonglor, 323 Soi Sukhumvit 15/Thonglor, Khlong Tan Nuea, Watthana",
+    "concept": "Glammed-up Thai-Teochew khao tom bar — 'Broth, Beats & Bottle service', small plates, late-night social energy",
+    "tags": ["bar", "drinks-led", "international"],
+    "source": "BK Magazine / Friday Bangkok",
+    "source_url": "https://fridaybangkok.com/v/sasa-khaotom-bar",
+    "instagram": "sasa_khaotombar",
+    "opening_date": "2026",
+    "phone": "",
+    "hours_close": 4,
+    "featured": ["BK Magazine"],
+    "notes": "Thonglor priority + open to 4am Fri/Sat + bottle service. Thai-Chinese khaotom pairs naturally with lager — strong Birra Moretti / Vana fit. NOT a live-band Thai pub, so no poor-fit penalty. Bottle-service format = volume opportunity."
+  },
+  {
+    "name": "Iris & Wild Iris",
+    "area": "Sathorn",
+    "address": "29-30F SO/ Bangkok (hotel), North Sathorn Rd, overlooking Lumphini Park",
+    "concept": "French Riviera-themed rooftop bar & restaurant, Italian sharing plates, cocktails and wine",
+    "tags": ["cocktail bar", "wine bar", "rooftop", "italian"],
+    "source": "Time Out Bangkok (best new bars 2026)",
+    "source_url": "https://www.timeout.com/bangkok/bars/iris-wild-iris",
+    "instagram": "",
+    "opening_date": "2025",
+    "phone": "",
+    "hours_close": 24,
+    "featured": [],
+    "notes": "Inside SO/ Bangkok hotel — auto-excluded by filter. Also opened late 2025 (outside recency window). Recorded so it never resurfaces."
+  }
+]
