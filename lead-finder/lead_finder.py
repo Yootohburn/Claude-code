@@ -443,10 +443,12 @@ def write_report(con: sqlite3.Connection, leads: list[sqlite3.Row], run_date: st
         fire = "🔥 " if r["score"] >= hot else ""
         fresh = '<span class="chip new">🆕 new</span> ' if is_recent(r["opening_date"], run_date) else ""
         feat = f'<span class="chip">{esc(r["featured"].replace(";", ", "))}</span>' if r["featured"] else ""
+        # We cannot confirm "open" without Google Maps (blocked here). A web signal
+        # is NOT proof of open — the rep must confirm on Maps/by phone before visiting.
         if r["verified"]:
-            feat += f' <span class="chip ok">✓ open · checked {esc(r["verified"])}</span>'
-        elif not r["opening_date"]:
-            feat += ' <span class="chip warn">⚠ verify open/date</span>'
+            feat += f' <span class="chip warn">web-active {esc(r["verified"])} · ☎ confirm open</span>'
+        else:
+            feat += ' <span class="chip warn">☎ confirm open</span>'
         feat = fresh + feat
         ig = (f' · <a href="https://www.instagram.com/{esc(r["instagram"]).lstrip("@")}/"'
               f' target="_blank">@{esc(r["instagram"]).lstrip("@")}</a>') if r["instagram"] else ""

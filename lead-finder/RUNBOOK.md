@@ -81,7 +81,25 @@ rep's patch goes uncovered.
   and not yet contacted is a valid lead; genuinely just-opened venues also get a
   🆕 flag. This guarantees per-zone volume even where nothing opened this month.
 
-## 1c. Verification (MANDATORY — do this before adding any venue)
+## 1c. Verification — KNOWN WEAK SPOT, read this
+
+**Automated open/closed verification is unreliable in this setup.** Google Maps
+(the only real source of truth for "currently open") is network-blocked here, so
+the run relies on web signals — and Thai listicles/blog posts are evergreen and
+routinely show venues that closed years ago. Venues that slipped through as
+"open" but were actually closed 5+ years: The 1925 Brewing, Bros Brew Beers,
+Brew Moon, Garden 52, Taproom x Ari. **Treat every lead as UNCONFIRMED until a
+human checks Google Maps / calls.** The report shows "☎ confirm open" on every
+venue for this reason; there is no "verified open" claim anymore.
+
+Reliable options to actually confirm open status:
+- **Rep confirms** on Google Maps or by phone as step 1 of outreach (current default).
+- **Give the tool a Google Places API key** (or paste Maps results) → the run can
+  then check `business_status` + last-review date and auto-drop CLOSED venues.
+- Keep the **customer blocklist** current (`data/customers.txt`) so existing
+  accounts never resurface — this is separate from open/closed and works well.
+
+### Verification steps the run still performs (best-effort, not proof)
 
 Listicles and old reviews (Wongnai/Lemon8 "best of") include venues that closed
 years ago. **A listing is not proof a venue is open.** Before a venue enters the
