@@ -1,37 +1,37 @@
 {
   "project": "Beervana — Bangkok New Venue Lead Finder",
   "city": "Bangkok",
-  "_zones_note": "5 sales-rep territories. B4/B5 areas are exactly as Yoo specified. B1-B3 are a PROVISIONAL geographic split (Yoo's MyMaps could not be read automatically) — correct any area's zone and re-run; mapping is by the 'areas' lists below.",
+  "_zones_note": "5 sales-rep territories derived by point-in-polygon from Yoo's KMZ map (BKK_new_zone_2026). Inner City = B1 (Eve) + B2 (Bo); Outer = B3 (Es, west/Thonburi) + B4 (Almond, east/SE) + B5 (Champ, north). Area->zone below is authoritative; edit an area's zone then run remap-zones.",
   "zones": {
     "B1": {
-      "rep_area": "Lower Sukhumvit / CBD",
-      "provisional": true,
-      "areas": ["Sukhumvit", "Asok", "Nana", "Phrom Phong", "Thonglor", "Ploenchit", "Chidlom", "Ratchaprasong", "Ratchadamri"],
-      "search_terms_th": ["ร้านเปิดใหม่ สุขุมวิท ทองหล่อ", "บาร์ คราฟท์เบียร์ เปิดใหม่ ทองหล่อ อโศก"]
+      "rep_area": "B1 Eve · Inner Sukhumvit core",
+      "provisional": false,
+      "areas": ["Asok", "Nana", "Phrom Phong", "Thonglor", "Ploenchit", "Chidlom", "Sukhumvit"],
+      "search_terms_th": ["ร้านเปิดใหม่ สุขุมวิท ทองหล่อ อโศก", "บาร์ คราฟท์เบียร์ เปิดใหม่ ทองหล่อ พร้อมพงษ์"]
     },
     "B2": {
-      "rep_area": "Silom / Sathorn / Riverside / Old Town",
-      "provisional": true,
-      "areas": ["Silom", "Sathorn", "Bang Rak", "Charoenkrung", "Yaowarat", "Old Town", "Banglamphu", "Riverside"],
-      "search_terms_th": ["ร้านเปิดใหม่ สีลม สาทร เจริญกรุง", "บาร์ คราฟท์เบียร์ เปิดใหม่ เยาวราช"]
+      "rep_area": "B2 Bo · Inner Silom-Sathorn + Ari/Phaya Thai",
+      "provisional": false,
+      "areas": ["Silom", "Sathorn", "Bang Rak", "Ratchaprasong", "Ratchathewi", "Ari", "Phaya Thai", "Victory Monument", "Sanam Pao", "Saphan Khwai", "Chatuchak", "Lat Phrao", "Huai Khwang"],
+      "search_terms_th": ["ร้านเปิดใหม่ สีลม สาทร บาร์ คราฟท์เบียร์", "บาร์ คราฟท์เบียร์ เปิดใหม่ อารีย์ พหลโยธิน ลาดพร้าว"]
     },
     "B3": {
-      "rep_area": "North Bangkok",
-      "provisional": true,
-      "areas": ["Ari", "Phaya Thai", "Ratchathewi", "Chatuchak", "Lat Phrao", "Sanam Pao", "Saphan Khwai"],
-      "search_terms_th": ["ร้านเปิดใหม่ อารีย์ พหลโยธิน", "บาร์ คราฟท์เบียร์ เปิดใหม่ อารีย์ ลาดพร้าว"]
+      "rep_area": "B3 Es · Old Town / Chinatown / Thonburi-West",
+      "provisional": false,
+      "areas": ["Yaowarat", "Old Town", "Banglamphu", "Charoenkrung", "Thonburi", "Pinklao", "Taling Chan", "Phasi Charoen", "Bang Khae", "Rattanakosin"],
+      "search_terms_th": ["ร้านเปิดใหม่ เยาวราช เจริญกรุง บาร์ คราฟท์เบียร์", "ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ ฝั่งธนบุรี ปิ่นเกล้า ตลิ่งชัน"]
     },
     "B4": {
-      "rep_area": "East / Southeast (Ekkamai → Samut Prakan)",
+      "rep_area": "B4 Almond · East / Southeast (Ekkamai → Samut Prakan)",
       "provisional": false,
-      "areas": ["Ekkamai", "Phra Khanong", "On Nut", "Udomsuk", "Bangna", "Srinakarin", "Bearing", "Samut Prakan", "Bang Na"],
-      "search_terms_th": ["ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ บางนา", "ร้านเปิดใหม่ พระโขนง อ่อนนุช บาร์ บิสโทร", "ร้านอาหารเปิดใหม่ สมุทรปราการ บาร์ คราฟท์เบียร์"]
+      "areas": ["Ekkamai", "Phra Khanong", "On Nut", "Udomsuk", "Bang Na", "Bangna", "Srinakarin", "Bearing", "Bang Phli", "Samut Prakan"],
+      "search_terms_th": ["ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ บางนา อ่อนนุช", "ร้านเปิดใหม่ พระโขนง เอกมัย อุดมสุข บาร์ บิสโทร", "ร้านอาหารเปิดใหม่ สมุทรปราการ บางพลี บาร์ คราฟท์เบียร์"]
     },
     "B5": {
-      "rep_area": "North / West suburbs",
+      "rep_area": "B5 Champ · North suburbs (Nonthaburi → Pathum Thani)",
       "provisional": false,
-      "areas": ["Nonthaburi", "Ratchapruek", "Rangsit", "Pathum Thani", "Pak Kret", "Chaengwatthana", "Thanyaburi"],
-      "search_terms_th": ["ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ นนทบุรี ราชพฤกษ์", "ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ รังสิต ฟิวเจอร์พาร์ค", "ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ ปทุมธานี"]
+      "areas": ["Nonthaburi", "Pak Kret", "Chaengwatthana", "Ratchapruek", "Rangsit", "Pathum Thani", "Thanyaburi"],
+      "search_terms_th": ["ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ นนทบุรี ปากเกร็ด แจ้งวัฒนะ", "ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ รังสิต ฟิวเจอร์พาร์ค ปทุมธานี"]
     }
   },
   "coverage": {

@@ -52,6 +52,74 @@ def is_hotel_venue(v: dict) -> bool:
 
 
 ZONES = CONFIG.get("zones", {})
+CUSTOMERS_FILE = ROOT / "data" / "customers.txt"
+
+
+def _alnum(s: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", (s or "").lower())
+
+
+def load_customers() -> list[str]:
+    """Normalized customer codes (markers/punct stripped, len>=4)."""
+    if not CUSTOMERS_FILE.exists():
+        return []
+    out = []
+    for line in CUSTOMERS_FILE.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        code = re.sub(r"^[\*0]+[-\s]*", "", line)   # drop leading *, 0-, markers
+        code = _alnum(code)
+        if len(code) >= 4:
+            out.append(code)
+    return sorted(set(out), key=len, reverse=True)
+
+
+CUSTOMER_CODES = load_customers()
+
+
+# Generic descriptor words that appear as customer codes but must NOT match on
+# their own (else "PICKLEBOY Burger" hits code BURGER, "Craft Estate" hits CRAFT).
+GENERIC_CODES = {
+    "bar", "beer", "beers", "craft", "craftbeer", "burger", "cafe", "coffee",
+    "pub", "hop", "hops", "house", "home", "room", "kitchen", "wine", "brew",
+    "brewing", "brewery", "thai", "bkk", "bangkok", "moon", "gold", "golden",
+    "bistro", "eatery", "taproom", "grill", "food", "drink", "drinks", "tap",
+    "taps", "more", "good", "new", "old", "big", "red", "blue", "black",
+    "white", "one", "two", "three", "four", "nana", "sky", "art", "haus",
+}
+
+
+def customer_match(name: str):
+    """Return the matched customer code if `name` looks like an existing account.
+    Generic descriptor words are ignored so real new venues aren't false-matched."""
+    v = _alnum(name)
+    if len(v) < 4:
+        return None
+    for c in CUSTOMER_CODES:
+        if c in GENERIC_CODES:
+            continue
+        if c == v:
+            return c
+        if len(c) >= 5 and (v.startswith(c) or c.startswith(v)):
+            return c
+        if len(c) >= 7 and c in v:
+            return c
+        # shared distinctive prefix (AFTERSUNBK vs "aftersun listening bar")
+        common = _commonprefix(c, v)
+        if len(common) >= 7 and common not in GENERIC_CODES:
+            return c
+        if len(c) >= 6 and SequenceMatcher(None, c, v[:len(c)]).ratio() >= 0.88:
+            return c
+    return None
+
+
+def _commonprefix(a: str, b: str) -> str:
+    n = min(len(a), len(b))
+    i = 0
+    while i < n and a[i] == b[i]:
+        i += 1
+    return a[:i]
 
 
 def zone_for_area(area: str) -> tuple[str, str]:
@@ -255,7 +323,11 @@ def ingest(raw_path: Path, run_date: str) -> dict:
             stats["dup"] += 1
             continue
         excluded, reason = 0, ""
-        if is_hotel_venue(v):
+        cust = customer_match(v["name"])
+        if cust:
+            excluded, reason = 1, f"existing customer (~{cust})"
+            stats["excluded"] += 1
+        elif is_hotel_venue(v):
             excluded, reason = 1, "hotel/hostel/resort keyword"
             stats["excluded"] += 1
         score, reasons = score_venue(v)
@@ -575,6 +647,21 @@ def main() -> None:
         last = con.execute("SELECT MAX(run_date) d FROM runs").fetchone()["d"]
         con.close()
         regenerate(last or today)
+    elif cmd == "purge-customers":
+        # re-check every venue against the customer list; exclude matches
+        con = db_connect()
+        n = 0
+        for r in con.execute("SELECT id, name FROM venues WHERE excluded=0"):
+            c = customer_match(r["name"])
+            if c:
+                con.execute("UPDATE venues SET excluded=1, exclude_reason=? WHERE id=?",
+                            (f"existing customer (~{c})", r["id"]))
+                n += 1
+                print(f"  excluded {r['name']} (~{c})")
+        con.commit()
+        con.close()
+        print(f"Purged {n} existing-customer venue(s).")
+        regenerate(today)
     elif cmd == "remap-zones":
         # re-apply zone mapping after editing config.json 'zones'
         con = db_connect()
