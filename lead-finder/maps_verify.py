@@ -10,6 +10,7 @@ Build the scraper first:  bash tools/setup_maps_scraper.sh
 """
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -50,8 +51,13 @@ def run_scraper(queries: list[str]) -> list[dict]:
            "-lang", cfg.get("lang", "en"),
            "-exit-on-inactivity", cfg.get("exit_on_inactivity", "3m")]
     print("Running:", " ".join(cmd))
+    env = dict(os.environ)
+    # playwright.azureedge.net was retired by Microsoft (404s since 2025);
+    # point playwright-go's driver download at the current CDN.
+    env.setdefault("PLAYWRIGHT_DOWNLOAD_HOST",
+                   "https://cdn.playwright.dev/dbazure/download/playwright")
     try:
-        subprocess.run(cmd, check=True, timeout=1800)
+        subprocess.run(cmd, check=True, timeout=1800, env=env)
     except subprocess.CalledProcessError as e:
         sys.exit(f"Scraper failed (exit {e.returncode}). If this is a network "
                  f"sandbox, Google Maps may be blocked — run where Maps is reachable.")
