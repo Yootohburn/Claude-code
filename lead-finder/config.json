@@ -40,6 +40,8 @@
     "note": "Weekly run should surface at least target_leads_per_zone uncontacted leads per zone; report flags any zone below min."
   },
   "maps_scraper": {
+    "mode": "http",
+    "_mode_note": "http = plain-HTTPS tbm=map endpoint (works in the Claude cloud sandbox; browser TLS is blocked by its egress proxy). Set to 'auto' or 'browser' on machines with normal internet for the full gosom scraper (richer data: hours, more reviews).",
     "binary": "tools/google-maps-scraper/gms",
     "exit_on_inactivity": "3m",
     "depth": 1,

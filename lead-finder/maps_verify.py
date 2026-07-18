@@ -55,6 +55,10 @@ def run_scraper(queries: list[str]) -> list[dict]:
     # with --ignore-certificate-errors, so the proxy's TLS interception is fine).
     proxies = cfg.get("proxies") or os.environ.get("HTTPS_PROXY", "")
     if proxies:
+        # the scraper's auth-proxy wrapper requires user:pass in the URL; the
+        # sandbox proxy ignores credentials, so inject dummies when absent
+        if "@" not in proxies:
+            proxies = proxies.replace("://", "://x:x@", 1)
         cmd += ["-proxies", proxies]
     print("Running:", " ".join(cmd))
     env = dict(os.environ)
@@ -65,11 +69,80 @@ def run_scraper(queries: list[str]) -> list[dict]:
     try:
         subprocess.run(cmd, check=True, timeout=1800, env=env)
     except subprocess.CalledProcessError as e:
-        sys.exit(f"Scraper failed (exit {e.returncode}). If this is a network "
-                 f"sandbox, Google Maps may be blocked — run where Maps is reachable.")
+        print(f"Scraper failed (exit {e.returncode}).")
+        return []
     except subprocess.TimeoutExpired:
         print("Scraper timed out; parsing whatever was written.")
     return parse_results(out)
+
+
+def _nth(a, *idx):
+    """Safe nested index into Google's darray structures (None on any miss)."""
+    for i in idx:
+        if not isinstance(a, list) or i >= len(a) or a[i] is None:
+            return None
+        a = a[i]
+    return a
+
+
+def _entry_from_darray(d) -> dict:
+    """Field indexes mirror tools/google-maps-scraper gmaps/entry.go.
+    Closed-state is the enum at [88][0] ('CLOSED' / 'TEMPORARILY_CLOSED' / absent);
+    [34][4][4] is unreliable in the tbm=map response (can hold category text)."""
+    status = _nth(d, 88, 0)
+    if not (isinstance(status, str) and "CLOSED" in status.upper()):
+        status = ""
+    return {
+        "title": _nth(d, 11) or "",
+        "review_count": _nth(d, 4, 8),
+        "rating": _nth(d, 4, 7),
+        "status": status,
+        "phone": _nth(d, 178, 0, 0) or "",
+        "address": _nth(d, 18) or "",
+        "link": _nth(d, 27) or "",
+        "open_hours": {},
+    }
+
+
+def http_fetch_places(query: str) -> list[dict]:
+    """Fetch place data over plain HTTPS via Google's tbm=map endpoint —
+    proxy-friendly (no browser TLS), returns the same darray the scraper parses."""
+    import urllib.request
+    from urllib.parse import quote_plus
+    url = f"https://www.google.com/search?tbm=map&hl=en&q={quote_plus(query)}"
+    req = urllib.request.Request(url, headers={
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Accept-Language": "en,th;q=0.8"})
+    text = urllib.request.urlopen(req, timeout=45).read().decode("utf-8", "replace")
+    if not text.startswith(")]}'"):
+        return []
+    try:
+        d = json.loads(text[4:].lstrip())
+    except json.JSONDecodeError:
+        return []
+    places = []
+    items = _nth(d, 0, 1)
+    for it in items if isinstance(items, list) else []:
+        da = _nth(it, 14)
+        if isinstance(da, list) and _nth(da, 11):
+            places.append(_entry_from_darray(da))
+    return places
+
+
+def run_http(queries: list[str]) -> list[dict]:
+    """HTTP fallback: fetch each query's Maps page with polite pacing."""
+    import random
+    import time
+    out = []
+    for i, q in enumerate(queries, 1):
+        try:
+            places = http_fetch_places(q)
+            print(f"  [{i}/{len(queries)}] {q!r} -> {len(places)} place(s)")
+            out += places
+        except Exception as e:  # noqa: BLE001 - log & continue per query
+            print(f"  [{i}/{len(queries)}] {q!r} -> fetch failed: {e}")
+        time.sleep(random.uniform(2.0, 4.5))
+    return out
 
 
 def parse_results(path: Path) -> list[dict]:
@@ -119,8 +192,15 @@ def verify_active_leads() -> None:
         print("No active leads to verify.")
         return
     queries = [f"{r['name']} {r['area'] or ''} Bangkok".strip() for r in leads]
-    entries = run_scraper(queries)
-    print(f"Scraper returned {len(entries)} place(s).")
+    mode = _cfg().get("mode", "auto")
+    entries = [] if mode == "http" else run_scraper(queries)
+    if not entries and mode != "browser":
+        # browser TLS is blocked by some egress proxies (e.g. Claude cloud
+        # sandbox) — fall back to plain-HTTPS fetching of the Maps pages,
+        # parsing the same embedded payload the scraper reads.
+        print("Falling back to HTTP mode (no browser)…")
+        entries = run_http(queries)
+    print(f"Maps lookup returned {len(entries)} place(s).")
 
     today = date.today().isoformat()
     thr = _cfg().get("match_threshold", 0.6)
