@@ -138,6 +138,8 @@ def run_http(queries: list[str]) -> list[dict]:
         try:
             places = http_fetch_places(q)
             print(f"  [{i}/{len(queries)}] {q!r} -> {len(places)} place(s)")
+            for p in places:
+                p["_qi"] = i - 1   # remember which query found it (match priority)
             out += places
         except Exception as e:  # noqa: BLE001 - log & continue per query
             print(f"  [{i}/{len(queries)}] {q!r} -> fetch failed: {e}")
@@ -205,10 +207,13 @@ def verify_active_leads() -> None:
     today = date.today().isoformat()
     thr = _cfg().get("match_threshold", 0.6)
     closed = updated = notfound = 0
-    for r in leads:
+    for li, r in enumerate(leads):
         vn = lf.norm_name(r["name"])
+        # prefer places found by this lead's own query; fall back to the pool
+        # (prevents cross-matching two venues that share similar names/phones)
+        own = [e for e in entries if e.get("_qi") == li]
         best, bestscore = None, 0.0
-        for e in entries:
+        for e in (own or entries):
             title = e.get("title", "")
             s = SequenceMatcher(None, vn, lf.norm_name(title)).ratio()
             if s > bestscore:
