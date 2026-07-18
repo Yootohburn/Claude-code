@@ -13,6 +13,8 @@ Usage:
   python3 lead_finder.py ingest data/runs/2026-07-10-raw_venues.json
   python3 lead_finder.py report            # regenerate outputs from DB only
   python3 lead_finder.py remap-zones       # re-apply zone map after editing config
+  python3 lead_finder.py verify-maps       # confirm open/closed via Google Maps scraper
+  python3 lead_finder.py purge-customers   # exclude venues matching data/customers.txt
   python3 lead_finder.py set-status "Venue Name" Contacted
   python3 lead_finder.py log "Venue" "note" [Status] [next action]
 """
@@ -443,10 +445,13 @@ def write_report(con: sqlite3.Connection, leads: list[sqlite3.Row], run_date: st
         fire = "🔥 " if r["score"] >= hot else ""
         fresh = '<span class="chip new">🆕 new</span> ' if is_recent(r["opening_date"], run_date) else ""
         feat = f'<span class="chip">{esc(r["featured"].replace(";", ", "))}</span>' if r["featured"] else ""
-        # We cannot confirm "open" without Google Maps (blocked here). A web signal
-        # is NOT proof of open — the rep must confirm on Maps/by phone before visiting.
-        if r["verified"]:
-            feat += f' <span class="chip warn">web-active {esc(r["verified"])} · ☎ confirm open</span>'
+        # Only Google-Maps-verified venues get a confident badge. A web signal
+        # (verified without the maps: prefix) still needs a Maps/phone check.
+        v = r["verified"] or ""
+        if v.startswith("maps:"):
+            feat += f' <span class="chip ok">✓ open · Google Maps {esc(v[5:])}</span>'
+        elif v:
+            feat += f' <span class="chip warn">web-active {esc(v)} · ☎ confirm open</span>'
         else:
             feat += ' <span class="chip warn">☎ confirm open</span>'
         feat = fresh + feat
@@ -649,6 +654,9 @@ def main() -> None:
         last = con.execute("SELECT MAX(run_date) d FROM runs").fetchone()["d"]
         con.close()
         regenerate(last or today)
+    elif cmd == "verify-maps":
+        import maps_verify
+        maps_verify.verify_active_leads()
     elif cmd == "purge-customers":
         # re-check every venue against the customer list; exclude matches
         con = db_connect()

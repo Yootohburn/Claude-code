@@ -92,12 +92,30 @@ Brew Moon, Garden 52, Taproom x Ari. **Treat every lead as UNCONFIRMED until a
 human checks Google Maps / calls.** The report shows "☎ confirm open" on every
 venue for this reason; there is no "verified open" claim anymore.
 
-Reliable options to actually confirm open status:
-- **Rep confirms** on Google Maps or by phone as step 1 of outreach (current default).
-- **Give the tool a Google Places API key** (or paste Maps results) → the run can
-  then check `business_status` + last-review date and auto-drop CLOSED venues.
-- Keep the **customer blocklist** current (`data/customers.txt`) so existing
-  accounts never resurface — this is separate from open/closed and works well.
+Reliable option — NOW INTEGRATED: the **Google Maps scraper**
+(gosom/google-maps-scraper). `verify-maps` scrapes each active lead, reads its
+Google `business_status`, and **auto-excludes CLOSED venues**, while filling in
+real review count, phone and hours.
+
+```bash
+bash tools/setup_maps_scraper.sh      # one-time: clone + build the scraper (needs Go)
+python3 lead_finder.py verify-maps    # confirm open/closed for all active leads
+```
+
+Maps-verified venues then show a green **"✓ open · Google Maps DATE"** badge;
+everything else stays **"☎ confirm open"**.
+
+⚠️ **Network requirement:** the scraper must reach Google Maps. Some sandboxes
+(including the default cloud environment for the weekly Routine) block Google —
+there `verify-maps` exits with a clear message. To make it work:
+- **Locally / Docker:** run `verify-maps` (or the scraper's Docker image) on a
+  machine with normal internet. Best for a manual weekly pass.
+- **In the cloud Routine:** set the environment's network access to **Full**
+  (or Custom allowing `google.com,*.google.com,*.googleapis.com`) at
+  claude.ai/code — then the weekly run auto-verifies.
+
+Also keep the **customer blocklist** current (`data/customers.txt`); it's
+separate from open/closed and already filters existing accounts every run.
 
 ### Verification steps the run still performs (best-effort, not proof)
 

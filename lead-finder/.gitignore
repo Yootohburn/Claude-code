@@ -1,0 +1,7 @@
+# Google Maps scraper: clone + built binary + outputs are not vendored.
+tools/google-maps-scraper/
+tools/*.bin
+gms
+maps-output/
+__pycache__/
+*.pyc

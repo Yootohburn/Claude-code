@@ -39,6 +39,15 @@
     "target_leads_per_zone": 2,
     "note": "Weekly run should surface at least target_leads_per_zone uncontacted leads per zone; report flags any zone below min."
   },
+  "maps_scraper": {
+    "binary": "tools/google-maps-scraper/gms",
+    "exit_on_inactivity": "3m",
+    "depth": 1,
+    "concurrency": 2,
+    "lang": "en",
+    "match_threshold": 0.6,
+    "_note": "gosom/google-maps-scraper. Build with tools/setup_maps_scraper.sh. Requires network access to Google Maps (blocked in some sandboxes). Used by: python3 lead_finder.py verify-maps"
+  },
   "freshness_mode": "new_to_db",
   "_freshness_note": "new_to_db: any venue not already in the SQLite DB and not yet contacted counts as a lead (Yoo's choice for low-press outer zones). Opening date is informational — venues opened <3 months get a 🆕 flag but old-but-uncontacted craft venues are still valid leads.",
   "priority_areas": ["Thonglor", "Ekkamai", "Ari"],
