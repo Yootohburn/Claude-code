@@ -50,6 +50,12 @@ def run_scraper(queries: list[str]) -> list[dict]:
            "-c", str(cfg.get("concurrency", 2)),
            "-lang", cfg.get("lang", "en"),
            "-exit-on-inactivity", cfg.get("exit_on_inactivity", "3m")]
+    # In proxied sandboxes Chromium doesn't read HTTPS_PROXY on its own — pass it
+    # through the scraper's -proxies flag (scrapemate already launches Chromium
+    # with --ignore-certificate-errors, so the proxy's TLS interception is fine).
+    proxies = cfg.get("proxies") or os.environ.get("HTTPS_PROXY", "")
+    if proxies:
+        cmd += ["-proxies", proxies]
     print("Running:", " ".join(cmd))
     env = dict(os.environ)
     # playwright.azureedge.net was retired by Microsoft (404s since 2025);
