@@ -1,0 +1,57 @@
+[
+  {
+    "name": "Let The Girl Kill",
+    "area": "Yaowarat",
+    "address": "Soi opposite Wat Traimit, Charoenkrung Rd, Chinatown",
+    "concept": "Craft beer bar in a Chinatown shophouse soi — Thai craft taps + bottles, indie crowd",
+    "tags": ["craft beer", "bar", "taproom"],
+    "source": "Traveloka Explore / Lemon8 (Thai)",
+    "source_url": "https://www.traveloka.com/th-th/explore/destination/explore-bar-china-town-bkk/51101",
+    "instagram": "", "opening_date": "", "phone": "", "hours_close": 24, "featured": [],
+    "notes": "B3 gap-filler (Chinatown). Craft-beer-led — strong Vana fit. Status to be confirmed by verify-maps."
+  },
+  {
+    "name": "Barbon",
+    "area": "Yaowarat",
+    "address": "3F Hostel Urby, Song Wat Rd, Talat Noi",
+    "concept": "Hidden riverside bar on Song Wat",
+    "tags": ["bar", "cocktail bar"],
+    "source": "Lemon8 (Thai)",
+    "source_url": "https://www.lemon8-app.com/@sweepermind/7343504367800025602",
+    "instagram": "", "opening_date": "", "phone": "", "hours_close": 24, "featured": [],
+    "notes": "Inside Hostel Urby — hostel keyword auto-excludes; recorded so it never resurfaces."
+  },
+  {
+    "name": "Char (Hotel Indigo Wireless Road)",
+    "area": "Ploenchit",
+    "address": "Top floors, Hotel Indigo, Wireless Rd",
+    "concept": "Grill restaurant + rooftop bar in Hotel Indigo",
+    "tags": ["bar", "grill", "international"],
+    "source": "BK Magazine (Jul 2026)",
+    "source_url": "https://www.bkmagazine.com/restaurants/news/new-restaurants-bangkok-july/",
+    "instagram": "", "opening_date": "2026-07", "phone": "", "hours_close": 24, "featured": ["BK Magazine"],
+    "notes": "Hotel venue — auto-excluded by filter; recorded."
+  },
+  {
+    "name": "Luke Bangkok",
+    "area": "Hua Lamphong",
+    "address": "Near Hua Lamphong station, Rong Mueang",
+    "concept": "Italian all-day dining in a revamped colonial building",
+    "tags": ["italian", "international"],
+    "source": "BK Magazine (Jul 2026)",
+    "source_url": "https://www.bkmagazine.com/restaurants/news/new-restaurants-bangkok-july/",
+    "instagram": "", "opening_date": "2026-07", "phone": "", "hours_close": null, "featured": ["BK Magazine"],
+    "notes": "Matches existing customer code LUKEBKK — ingest should auto-exclude; recorded for the blocklist memory."
+  },
+  {
+    "name": "Charoenkrung Bar & Bistro",
+    "area": "Charoenkrung",
+    "address": "Charoenkrung Rd",
+    "concept": "Bar & bistro with live music",
+    "tags": ["bar", "drinks-led"],
+    "source": "Lemon8 / Facebook (Thai)",
+    "source_url": "https://www.facebook.com/Charoenkrungbarandbistro/",
+    "instagram": "", "opening_date": "", "phone": "", "hours_close": 24, "featured": [],
+    "notes": "Likely matches existing customer code 0-CHAROEN — let the customer matcher decide."
+  }
+]

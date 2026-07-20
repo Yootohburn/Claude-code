@@ -6,32 +6,102 @@
     "B1": {
       "rep_area": "B1 Eve · Inner Sukhumvit core",
       "provisional": false,
-      "areas": ["Asok", "Nana", "Phrom Phong", "Thonglor", "Ploenchit", "Chidlom", "Sukhumvit"],
-      "search_terms_th": ["ร้านเปิดใหม่ สุขุมวิท ทองหล่อ อโศก", "บาร์ คราฟท์เบียร์ เปิดใหม่ ทองหล่อ พร้อมพงษ์"]
+      "areas": [
+        "Asok",
+        "Nana",
+        "Phrom Phong",
+        "Thonglor",
+        "Ploenchit",
+        "Chidlom",
+        "Sukhumvit"
+      ],
+      "search_terms_th": [
+        "ร้านเปิดใหม่ สุขุมวิท ทองหล่อ อโศก",
+        "บาร์ คราฟท์เบียร์ เปิดใหม่ ทองหล่อ พร้อมพงษ์"
+      ]
     },
     "B2": {
       "rep_area": "B2 Bo · Inner Silom-Sathorn + Ari/Phaya Thai",
       "provisional": false,
-      "areas": ["Silom", "Sathorn", "Bang Rak", "Ratchaprasong", "Ratchathewi", "Ari", "Phaya Thai", "Victory Monument", "Sanam Pao", "Saphan Khwai", "Chatuchak", "Lat Phrao", "Huai Khwang"],
-      "search_terms_th": ["ร้านเปิดใหม่ สีลม สาทร บาร์ คราฟท์เบียร์", "บาร์ คราฟท์เบียร์ เปิดใหม่ อารีย์ พหลโยธิน ลาดพร้าว"]
+      "areas": [
+        "Silom",
+        "Sathorn",
+        "Bang Rak",
+        "Ratchaprasong",
+        "Ratchathewi",
+        "Ari",
+        "Phaya Thai",
+        "Victory Monument",
+        "Sanam Pao",
+        "Saphan Khwai",
+        "Chatuchak",
+        "Lat Phrao",
+        "Huai Khwang"
+      ],
+      "search_terms_th": [
+        "ร้านเปิดใหม่ สีลม สาทร บาร์ คราฟท์เบียร์",
+        "บาร์ คราฟท์เบียร์ เปิดใหม่ อารีย์ พหลโยธิน ลาดพร้าว"
+      ]
     },
     "B3": {
       "rep_area": "B3 Es · Old Town / Chinatown / Thonburi-West",
       "provisional": false,
-      "areas": ["Yaowarat", "Old Town", "Banglamphu", "Charoenkrung", "Thonburi", "Pinklao", "Taling Chan", "Phasi Charoen", "Bang Khae", "Rattanakosin"],
-      "search_terms_th": ["ร้านเปิดใหม่ เยาวราช เจริญกรุง บาร์ คราฟท์เบียร์", "ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ ฝั่งธนบุรี ปิ่นเกล้า ตลิ่งชัน"]
+      "areas": [
+        "Yaowarat",
+        "Old Town",
+        "Banglamphu",
+        "Charoenkrung",
+        "Thonburi",
+        "Pinklao",
+        "Taling Chan",
+        "Phasi Charoen",
+        "Bang Khae",
+        "Rattanakosin",
+        "Bang Phlat",
+        "Charan Sanitwong"
+      ],
+      "search_terms_th": [
+        "ร้านเปิดใหม่ เยาวราช เจริญกรุง บาร์ คราฟท์เบียร์",
+        "ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ ฝั่งธนบุรี ปิ่นเกล้า ตลิ่งชัน"
+      ]
     },
     "B4": {
       "rep_area": "B4 Almond · East / Southeast (Ekkamai → Samut Prakan)",
       "provisional": false,
-      "areas": ["Ekkamai", "Phra Khanong", "On Nut", "Udomsuk", "Bang Na", "Bangna", "Srinakarin", "Bearing", "Bang Phli", "Samut Prakan"],
-      "search_terms_th": ["ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ บางนา อ่อนนุช", "ร้านเปิดใหม่ พระโขนง เอกมัย อุดมสุข บาร์ บิสโทร", "ร้านอาหารเปิดใหม่ สมุทรปราการ บางพลี บาร์ คราฟท์เบียร์"]
+      "areas": [
+        "Ekkamai",
+        "Phra Khanong",
+        "On Nut",
+        "Udomsuk",
+        "Bang Na",
+        "Bangna",
+        "Srinakarin",
+        "Bearing",
+        "Bang Phli",
+        "Samut Prakan"
+      ],
+      "search_terms_th": [
+        "ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ บางนา อ่อนนุช",
+        "ร้านเปิดใหม่ พระโขนง เอกมัย อุดมสุข บาร์ บิสโทร",
+        "ร้านอาหารเปิดใหม่ สมุทรปราการ บางพลี บาร์ คราฟท์เบียร์"
+      ]
     },
     "B5": {
       "rep_area": "B5 Champ · North suburbs (Nonthaburi → Pathum Thani)",
       "provisional": false,
-      "areas": ["Nonthaburi", "Pak Kret", "Chaengwatthana", "Ratchapruek", "Rangsit", "Pathum Thani", "Thanyaburi"],
-      "search_terms_th": ["ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ นนทบุรี ปากเกร็ด แจ้งวัฒนะ", "ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ รังสิต ฟิวเจอร์พาร์ค ปทุมธานี"]
+      "areas": [
+        "Nonthaburi",
+        "Pak Kret",
+        "Chaengwatthana",
+        "Ratchapruek",
+        "Rangsit",
+        "Pathum Thani",
+        "Thanyaburi"
+      ],
+      "search_terms_th": [
+        "ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ นนทบุรี ปากเกร็ด แจ้งวัฒนะ",
+        "ร้านคราฟท์เบียร์ บาร์ เปิดใหม่ รังสิต ฟิวเจอร์พาร์ค ปทุมธานี"
+      ]
     }
   },
   "coverage": {
@@ -52,23 +122,67 @@
   },
   "freshness_mode": "new_to_db",
   "_freshness_note": "new_to_db: any venue not already in the SQLite DB and not yet contacted counts as a lead (Yoo's choice for low-press outer zones). Opening date is informational — venues opened <3 months get a 🆕 flag but old-but-uncontacted craft venues are still valid leads.",
-  "priority_areas": ["Thonglor", "Ekkamai", "Ari"],
+  "priority_areas": [
+    "Thonglor",
+    "Ekkamai",
+    "Ari"
+  ],
   "recency_months": 3,
   "low_review_count_threshold": 150,
   "exclude_keywords": [
-    "hotel", "hostel", "resort",
-    "marriott", "hyatt", "hilton", "moxy", "andaz", "dusit thani",
-    "dusit central", "mercure", "novotel", "ibis", "kimpton", "sheraton",
-    "westin", "conrad", "intercontinental", "sofitel", "pullman",
-    "banyan tree", "anantara", "avani", "centara", "sindhorn kempinski",
-    "four seasons", "capella", "st. regis", "st regis", "park hyatt",
-    "waldorf", "okura", "carlton", "radisson", "holiday inn"
+    "hotel",
+    "hostel",
+    "resort",
+    "marriott",
+    "hyatt",
+    "hilton",
+    "moxy",
+    "andaz",
+    "dusit thani",
+    "dusit central",
+    "mercure",
+    "novotel",
+    "ibis",
+    "kimpton",
+    "sheraton",
+    "westin",
+    "conrad",
+    "intercontinental",
+    "sofitel",
+    "pullman",
+    "banyan tree",
+    "anantara",
+    "avani",
+    "centara",
+    "sindhorn kempinski",
+    "four seasons",
+    "capella",
+    "st. regis",
+    "st regis",
+    "park hyatt",
+    "waldorf",
+    "okura",
+    "carlton",
+    "radisson",
+    "holiday inn"
   ],
   "portfolio": {
     "brands": [
-      {"name": "Vana Brewing", "style": "Bangkok craft brewery", "url": "https://www.vanabrewing.com/"},
-      {"name": "Erdinger", "style": "German/Bavarian weissbier", "url": "https://erdinger.de/en-US"},
-      {"name": "Birra Moretti", "style": "Italian lager, food pairing / aperitivo", "url": "https://www.birramoretti.com/global/en/our-beers/"}
+      {
+        "name": "Vana Brewing",
+        "style": "Bangkok craft brewery",
+        "url": "https://www.vanabrewing.com/"
+      },
+      {
+        "name": "Erdinger",
+        "style": "German/Bavarian weissbier",
+        "url": "https://erdinger.de/en-US"
+      },
+      {
+        "name": "Birra Moretti",
+        "style": "Italian lager, food pairing / aperitivo",
+        "url": "https://www.birramoretti.com/global/en/our-beers/"
+      }
     ]
   },
   "scoring": {
@@ -80,12 +194,62 @@
     "fusion_international": 10,
     "open_late": 10,
     "poor_fit_penalty": -20,
-    "craft_tags": ["craft beer", "beer garden", "gastropub", "taproom", "brewpub", "brewery"],
-    "drinks_tags": ["cocktail bar", "wine bar", "bar", "pub", "drinks-led", "speakeasy", "listening bar"],
-    "featured_sources": ["Michelin Guide", "BK Magazine"],
-    "portfolio_tags": ["italian", "german", "bavarian", "european", "mediterranean", "french", "spanish", "tapas", "aperitivo", "wheat beer", "import beer", "beer garden", "craft beer", "taproom", "gastropub"],
-    "fusion_tags": ["fusion", "international", "thai-western", "european", "italian", "french", "japanese", "german", "mediterranean", "western"],
-    "poor_fit_tags": ["thai pub", "live band pub", "mor lam", "luk thung"],
+    "craft_tags": [
+      "craft beer",
+      "beer garden",
+      "gastropub",
+      "taproom",
+      "brewpub",
+      "brewery"
+    ],
+    "drinks_tags": [
+      "cocktail bar",
+      "wine bar",
+      "bar",
+      "pub",
+      "drinks-led",
+      "speakeasy",
+      "listening bar"
+    ],
+    "featured_sources": [
+      "Michelin Guide",
+      "BK Magazine"
+    ],
+    "portfolio_tags": [
+      "italian",
+      "german",
+      "bavarian",
+      "european",
+      "mediterranean",
+      "french",
+      "spanish",
+      "tapas",
+      "aperitivo",
+      "wheat beer",
+      "import beer",
+      "beer garden",
+      "craft beer",
+      "taproom",
+      "gastropub"
+    ],
+    "fusion_tags": [
+      "fusion",
+      "international",
+      "thai-western",
+      "european",
+      "italian",
+      "french",
+      "japanese",
+      "german",
+      "mediterranean",
+      "western"
+    ],
+    "poor_fit_tags": [
+      "thai pub",
+      "live band pub",
+      "mor lam",
+      "luk thung"
+    ],
     "open_late_hour": 23
   },
   "score_hot_threshold": 70,

@@ -1,0 +1,24 @@
+[
+  {
+    "name": "Cham Thing",
+    "area": "Pinklao",
+    "address": "Charan Sanitwong - Pinklao area",
+    "concept": "Cozy neighborhood bar, live music, budget-friendly drinks",
+    "tags": ["bar", "drinks-led", "live music"],
+    "source": "Lemon8 (Thai)",
+    "source_url": "https://www.lemon8-app.com/@sanaehereofficial/7416300305194746369",
+    "instagram": "", "opening_date": "", "phone": "", "hours_close": 24, "featured": [],
+    "notes": "B3 Thonburi-west. CHECK: Beervana serves several CHAM* accounts (CHAMKHAW/CHAMKOK/CHAMMAI) - confirm this isn't the same chain before outreach."
+  },
+  {
+    "name": "Tidtrain Rooftop Bar",
+    "area": "Bang Phlat",
+    "address": "Bang Phlat (rooftop)",
+    "concept": "New hidden rooftop cocktail bar in Bang Phlat",
+    "tags": ["cocktail bar", "bar", "rooftop"],
+    "source": "Lemon8 (Thai)",
+    "source_url": "https://www.lemon8-app.com/@tidtrain_rooftop.bar/7412587655201833488",
+    "instagram": "tidtrain_rooftop.bar", "opening_date": "", "phone": "", "hours_close": 24, "featured": [],
+    "notes": "B3 Thonburi-west. Independent rooftop (not hotel per source). Verify-maps to confirm."
+  }
+]

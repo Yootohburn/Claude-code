@@ -193,7 +193,12 @@ def verify_active_leads() -> None:
     if not leads:
         print("No active leads to verify.")
         return
-    queries = [f"{r['name']} {r['area'] or ''} Bangkok".strip() for r in leads]
+    import re as _re
+    # parenthesised suffixes ("Tempo Room (House of Tango)") break Maps search
+    queries = []
+    for r in leads:
+        clean = _re.sub(r"\s*\([^)]*\)", "", r["name"]).strip()
+        queries.append(f"{clean} {r['area'] or ''} Bangkok".strip())
     mode = _cfg().get("mode", "auto")
     entries = [] if mode == "http" else run_scraper(queries)
     if not entries and mode != "browser":
