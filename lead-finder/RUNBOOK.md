@@ -49,6 +49,18 @@ python3 lead_finder.py rescore                     # recompute scores after conf
 First run builds the baseline; from run 2 onward only never-seen venues count as
 "new this week".
 
+### Maps-native discovery (runs alongside web research)
+
+`python3 lead_finder.py discover-maps [B1..B5] [max_reviews]` searches Google
+Maps directly around each zone's centroid (craft beer bar / gastropub / bar
+เปิดใหม่ queries, ~20 results each), auto-filters existing customers
+(data/customers_names.csv — 1,555 names from the ข้อมูลร้านกับSale2025 sheet —
+plus data/customers.txt codes), DB duplicates, hotels and CLOSED places, and
+writes an ingestable candidates file. Craft-signal candidates (name/category
+contains craft/brew/taproom/เบียร์ etc.) are the ones worth ingesting; the
+rest stay as a backlog pool. Note: this endpoint doesn't serve review counts,
+so 'how new is it' is confirmed at first contact.
+
 ### Follow-up engine
 
 Every report and DM summary includes a **Follow-ups due** section:
