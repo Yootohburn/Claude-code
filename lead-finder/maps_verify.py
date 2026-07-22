@@ -92,6 +92,7 @@ def _entry_from_darray(d) -> dict:
     status = _nth(d, 88, 0)
     if not (isinstance(status, str) and "CLOSED" in status.upper()):
         status = ""
+    cats = _nth(d, 13)
     return {
         "title": _nth(d, 11) or "",
         "review_count": _nth(d, 4, 8),
@@ -100,6 +101,7 @@ def _entry_from_darray(d) -> dict:
         "phone": _nth(d, 178, 0, 0) or "",
         "address": _nth(d, 18) or "",
         "link": _nth(d, 27) or "",
+        "categories": [c for c in cats if isinstance(c, str)] if isinstance(cats, list) else [],
         "open_hours": {},
     }
 
@@ -183,6 +185,102 @@ def _closing_hour(open_hours) -> int | None:
                 if best is None or h == 0 or (0 < h < 6) or h > best:
                     best = h if h else 24
     return best
+
+
+DISCOVER_QUERIES = ["bar {area} Bangkok เปิดใหม่", "craft beer bar {area}", "บาร์ {area}"]
+
+
+def discover_zone(zone_key: str, max_reviews: int = 30) -> list[dict]:
+    """Find recently-listed bars on Google Maps for one rep zone.
+
+    Low review count is the proxy for 'recently added to Maps'. Filters out
+    CLOSED places, existing customers (sheet-name + code match), venues already
+    in the DB, and hotel-keyword names."""
+    import random
+    import time
+    zone = lf.ZONES[zone_key]
+    con = lf.db_connect()
+    seen: dict[str, dict] = {}
+    for area in zone.get("areas", [])[:6]:
+        for tpl in DISCOVER_QUERIES[:2]:
+            q = tpl.format(area=area)
+            try:
+                places = http_fetch_places(q)
+            except Exception as e:  # noqa: BLE001
+                print(f"    {q!r} fetch failed: {e}")
+                continue
+            for p in places:
+                key = lf.norm_name(p["title"])
+                if key and key not in seen:
+                    p["_area"] = area
+                    seen[key] = p
+            time.sleep(random.uniform(2.0, 4.0))
+    out, skipped = [], {"closed": 0, "customer": 0, "in_db": 0, "hotel": 0, "reviews": 0}
+    for key, p in seen.items():
+        if p["status"] == "CLOSED":
+            skipped["closed"] += 1
+            continue
+        rc = p["review_count"]
+        if rc is not None and rc > max_reviews:
+            skipped["reviews"] += 1
+            continue
+        cust = lf.customer_name_match(p["title"]) or lf.customer_match(p["title"])
+        if cust:
+            skipped["customer"] += 1
+            continue
+        if lf.find_duplicate(con, key):
+            skipped["in_db"] += 1
+            continue
+        if lf.is_hotel_venue({"name": p["title"], "address": p["address"]}):
+            skipped["hotel"] += 1
+            continue
+        out.append(p)
+    con.close()
+    print(f"  {zone_key}: {len(seen)} places seen -> {len(out)} new candidates "
+          f"(skipped: {skipped})")
+    return out
+
+
+def discover(zones: list[str] | None = None, max_reviews: int = 30) -> Path:
+    """Run discovery across zones; write candidates as an ingestable run file."""
+    today = date.today().isoformat()
+    zones = zones or list(lf.ZONES)
+    venues = []
+    for zk in zones:
+        print(f"Discovering {zk} ({lf.ZONES[zk].get('rep_area','')}), "
+              f"review-count <= {max_reviews}…")
+        for p in discover_zone(zk, max_reviews):
+            cats = [c.lower() for c in p.get("categories", [])]
+            tags = ["bar"]
+            if any("craft" in c or "brew" in c for c in cats):
+                tags.append("craft beer")
+            if any("pub" in c for c in cats):
+                tags.append("pub")
+            if any("cocktail" in c for c in cats):
+                tags.append("cocktail bar")
+            venues.append({
+                "name": p["title"],
+                "area": p["_area"],
+                "address": p["address"],
+                "concept": ", ".join(p.get("categories", [])) or "Bar (Maps discovery)",
+                "tags": tags,
+                "source": "Google Maps discovery (new listing)",
+                "source_url": p["link"] or "",
+                "instagram": "",
+                "opening_date": "",
+                "phone": p["phone"],
+                "hours_close": None,
+                "featured": [],
+                "verified": f"maps:{today}",
+                "review_count": p["review_count"],
+                "notes": (f"Maps-native discovery: only {p['review_count'] if p['review_count'] is not None else 'no'} "
+                          f"reviews (recently listed). Rating {p.get('rating') or '—'}. "
+                          f"Confirm opening date on first contact."),
+            })
+    out = lf.ROOT / "data" / "runs" / f"{today}-discovered.json"
+    out.write_text(json.dumps(venues, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"\nWrote {len(venues)} candidate(s) -> {out}")
+    return out
 
 
 def verify_active_leads() -> None:

@@ -78,6 +78,42 @@ def load_customers() -> list[str]:
 
 
 CUSTOMER_CODES = load_customers()
+CUSTOMER_NAMES_CSV = ROOT / "data" / "customers_names.csv"
+
+
+def load_customer_names() -> list[tuple[str, str]]:
+    """(normalized_name, 'display/CODE') pairs from the master customer sheet
+    (ข้อมูลร้านกับSale2025). Name matching is far more reliable than code guessing."""
+    if not CUSTOMER_NAMES_CSV.exists():
+        return []
+    out = []
+    with CUSTOMER_NAMES_CSV.open(encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            name = (row.get("venue_name") or "").strip()
+            if not name or name == "ชื่อร้าน":
+                continue
+            nn = norm_name(name)
+            if len(nn) >= 3:
+                out.append((nn, f"{name}/{row.get('code') or '-'}"))
+    return out
+
+
+CUSTOMER_NAMES = load_customer_names()
+
+
+def customer_name_match(name: str):
+    """Match a candidate venue against real customer venue NAMES from the sheet."""
+    nn = norm_name(name)
+    ntok = set(nn.split())
+    for cn, label in CUSTOMER_NAMES:
+        if cn == nn:
+            return label
+        if SequenceMatcher(None, cn, nn).ratio() >= 0.87:
+            return label
+        ctok = set(cn.split())
+        if len(ntok & ctok) >= 2 and (ntok <= ctok or ctok <= ntok):
+            return label
+    return None
 
 
 # Generic descriptor words that appear as customer codes but must NOT match on
@@ -325,9 +361,9 @@ def ingest(raw_path: Path, run_date: str) -> dict:
             stats["dup"] += 1
             continue
         excluded, reason = 0, ""
-        cust = customer_match(v["name"])
+        cust = customer_name_match(v["name"]) or customer_match(v["name"])
         if cust:
-            excluded, reason = 1, f"existing customer (~{cust})"
+            excluded, reason = 1, f"existing customer ({cust})"
             stats["excluded"] += 1
         elif is_hotel_venue(v):
             excluded, reason = 1, "hotel/hostel/resort keyword"
@@ -657,17 +693,24 @@ def main() -> None:
     elif cmd == "verify-maps":
         import maps_verify
         maps_verify.verify_active_leads()
+    elif cmd == "discover-maps":
+        # discover-maps [B1..B5 ...] [max_reviews] — find newly-listed bars on Maps
+        import maps_verify
+        args = sys.argv[2:]
+        max_rev = int(args[-1]) if args and args[-1].isdigit() else 30
+        zones = [a for a in args if a in ZONES] or None
+        maps_verify.discover(zones, max_rev)
     elif cmd == "purge-customers":
         # re-check every venue against the customer list; exclude matches
         con = db_connect()
         n = 0
         for r in con.execute("SELECT id, name FROM venues WHERE excluded=0"):
-            c = customer_match(r["name"])
+            c = customer_name_match(r["name"]) or customer_match(r["name"])
             if c:
                 con.execute("UPDATE venues SET excluded=1, exclude_reason=? WHERE id=?",
-                            (f"existing customer (~{c})", r["id"]))
+                            (f"existing customer ({c})", r["id"]))
                 n += 1
-                print(f"  excluded {r['name']} (~{c})")
+                print(f"  excluded {r['name']} ({c})")
         con.commit()
         con.close()
         print(f"Purged {n} existing-customer venue(s).")
