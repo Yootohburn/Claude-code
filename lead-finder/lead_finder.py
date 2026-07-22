@@ -370,6 +370,9 @@ def ingest(raw_path: Path, run_date: str) -> dict:
             stats["excluded"] += 1
         score, reasons = score_venue(v)
         zkey, rep_area = zone_for_area(v.get("area", ""))
+        if v.get("zone") in ZONES:   # explicit zone (e.g. Maps discovery anchor)
+            zkey = v["zone"]
+            rep_area = ZONES[zkey].get("rep_area", "")
         con.execute(
             """INSERT INTO venues (name, norm_name, area, address, concept, tags,
                source, source_url, maps_link, phone, opening_date, hours_close,

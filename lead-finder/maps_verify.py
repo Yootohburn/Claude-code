@@ -187,34 +187,62 @@ def _closing_hour(open_hours) -> int | None:
     return best
 
 
-DISCOVER_QUERIES = ["bar {area} Bangkok เปิดใหม่", "craft beer bar {area}", "บาร์ {area}"]
+def map_list_search(query: str, lat: float, lon: float, zoom: float = 13.0) -> list[dict]:
+    """Category/list search on Google Maps via the maps.google.com/search pb
+    endpoint (~20 results/query, plain HTTPS). pb template mirrors the gosom
+    scraper's searchjob.go. Note: this endpoint does NOT serve review counts."""
+    import urllib.request
+    from urllib.parse import urlencode
+    pb = (f"!4m12!1m3!1d3826.902183192154!2d{lon:.4f}!3d{lat:.4f}!2m3!1f0!2f0!3f0"
+          f"!3m2!1i600!2i800!4f{zoom:.1f}!7i20!8i0"
+          "!10b1!12m22!1m3!18b1!30b1!34e1!2m3!5m1!6e2!20e3!4b0!10b1!12b1!13b1"
+          "!16b1!17m1!3e1!20m3!5e2!6b1!14b1!46m1!1b0!96b1!19m4!2m3!1i360!2i120!4i8")
+    url = "https://maps.google.com/search?" + urlencode(
+        {"tbm": "map", "authuser": "0", "hl": "en", "q": query, "pb": pb})
+    req = urllib.request.Request(url, headers={
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"})
+    raw = urllib.request.urlopen(req, timeout=45).read().decode("utf-8", "replace")
+    body = raw.split("\n", 1)[1] if "\n" in raw else raw
+    try:
+        d = json.loads(body)
+    except json.JSONDecodeError:
+        return []
+    places = []
+    items = _nth(d, 0, 1)
+    for it in items if isinstance(items, list) else []:
+        da = _nth(it, 14)
+        if isinstance(da, list) and _nth(da, 11):
+            places.append(_entry_from_darray(da))
+    return places
 
 
 def discover_zone(zone_key: str, max_reviews: int = 30) -> list[dict]:
-    """Find recently-listed bars on Google Maps for one rep zone.
-
-    Low review count is the proxy for 'recently added to Maps'. Filters out
-    CLOSED places, existing customers (sheet-name + code match), venues already
-    in the DB, and hotel-keyword names."""
+    """Find candidate bars on Google Maps for one rep zone (centroid list
+    search). Filters out CLOSED places, existing customers (sheet-name + code
+    match), venues already in the DB, and hotel-keyword names. The endpoint
+    doesn't serve review counts, so recency is confirmed at triage/contact."""
     import random
     import time
     zone = lf.ZONES[zone_key]
+    lat, lon = zone.get("centroid", (13.75, 100.52))
+    zoom = lf.CONFIG.get("maps_discovery", {}).get("zoom", 13.0)
+    queries = lf.CONFIG.get("maps_discovery", {}).get(
+        "queries", ["craft beer bar", "gastropub bistro beer", "bar เปิดใหม่"])
     con = lf.db_connect()
     seen: dict[str, dict] = {}
-    for area in zone.get("areas", [])[:6]:
-        for tpl in DISCOVER_QUERIES[:2]:
-            q = tpl.format(area=area)
-            try:
-                places = http_fetch_places(q)
-            except Exception as e:  # noqa: BLE001
-                print(f"    {q!r} fetch failed: {e}")
-                continue
-            for p in places:
-                key = lf.norm_name(p["title"])
-                if key and key not in seen:
-                    p["_area"] = area
-                    seen[key] = p
-            time.sleep(random.uniform(2.0, 4.0))
+    for q in queries:
+        try:
+            places = map_list_search(q, lat, lon, zoom)
+        except Exception as e:  # noqa: BLE001
+            print(f"    {q!r} fetch failed: {e}")
+            continue
+        print(f"    {q!r} -> {len(places)} place(s)")
+        for p in places:
+            key = lf.norm_name(p["title"])
+            if key and key not in seen:
+                p["_area"] = zone.get("rep_area", zone_key)
+                seen[key] = p
+        time.sleep(random.uniform(2.0, 4.0))
     out, skipped = [], {"closed": 0, "customer": 0, "in_db": 0, "hotel": 0, "reviews": 0}
     for key, p in seen.items():
         if p["status"] == "CLOSED":
@@ -249,6 +277,7 @@ def discover(zones: list[str] | None = None, max_reviews: int = 30) -> Path:
     for zk in zones:
         print(f"Discovering {zk} ({lf.ZONES[zk].get('rep_area','')}), "
               f"review-count <= {max_reviews}…")
+        zone_areas = lf.ZONES[zk].get("areas", [])
         for p in discover_zone(zk, max_reviews):
             cats = [c.lower() for c in p.get("categories", [])]
             tags = ["bar"]
@@ -258,9 +287,12 @@ def discover(zones: list[str] | None = None, max_reviews: int = 30) -> Path:
                 tags.append("pub")
             if any("cocktail" in c for c in cats):
                 tags.append("cocktail bar")
+            addr = str(p.get("address") or "")
+            area = next((a for a in zone_areas if a.lower() in addr.lower()), "")
             venues.append({
                 "name": p["title"],
-                "area": p["_area"],
+                "zone": zk,
+                "area": area or zone_areas[0] if zone_areas else "",
                 "address": p["address"],
                 "concept": ", ".join(p.get("categories", [])) or "Bar (Maps discovery)",
                 "tags": tags,
