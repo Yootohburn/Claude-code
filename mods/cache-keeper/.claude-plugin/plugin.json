@@ -1,0 +1,10 @@
+{
+  "name": "cache-keeper",
+  "version": "0.1.0",
+  "description": "Prompt-cache countdown, token and cost readout, and one-click session handoff",
+  "types": "./types/index.d.ts",
+  "author": {
+    "name": "Yootohburn"
+  },
+  "license": "MIT"
+}

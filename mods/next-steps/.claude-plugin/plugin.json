@@ -1,0 +1,10 @@
+{
+  "name": "next-steps",
+  "version": "0.1.0",
+  "description": "After each turn, suggests 3 next steps you can run in one click",
+  "types": "./types/index.d.ts",
+  "author": {
+    "name": "Yootohburn"
+  },
+  "license": "MIT"
+}

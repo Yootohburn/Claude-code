@@ -1,0 +1,9 @@
+{
+  "name": "collision-guard",
+  "version": "0.1.0",
+  "description": "Asks before editing a file another session edited in the last 30 minutes",
+  "author": {
+    "name": "Yootohburn"
+  },
+  "license": "MIT"
+}

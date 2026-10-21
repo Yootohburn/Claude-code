@@ -1,0 +1,10 @@
+{
+  "name": "recording-mode",
+  "version": "0.1.0",
+  "description": "/record on|off masks emails, money, keys and tokens on screen for screen recording",
+  "types": "./types/index.d.ts",
+  "author": {
+    "name": "Yootohburn"
+  },
+  "license": "MIT"
+}

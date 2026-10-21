@@ -1,0 +1,11 @@
+{
+  "name": "yootohburn-mods",
+  "owner": { "name": "Yootohburn" },
+  "plugins": [
+    { "name": "next-steps", "source": "./mods/next-steps", "description": "After each turn, suggests 3 next steps you can run in one click" },
+    { "name": "cache-keeper", "source": "./mods/cache-keeper", "description": "Prompt-cache countdown, token and cost readout, and one-click session handoff" },
+    { "name": "recording-mode", "source": "./mods/recording-mode", "description": "/record on|off masks emails, money, keys and tokens on screen for screen recording" },
+    { "name": "goal-tracker", "source": "./mods/goal-tracker", "description": "Live checklist, elapsed time and progress for /goal and task lists, across sessions" },
+    { "name": "collision-guard", "source": "./mods/collision-guard", "description": "Asks before editing a file another session edited in the last 30 minutes" }
+  ]
+}
